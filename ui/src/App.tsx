@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ConfigForm } from './components/ConfigForm';
 import { Results } from './components/Results';
 import { LiveDashboard } from './components/LiveDashboard';
+import { WhatIfQuickReference } from './components/WhatIfQuickReference';
 import { SimulationConfig, SimulationResults } from './types';
 import { getTemplate, runSimulation, pauseSimulation, resumeSimulation } from './api';
 import './App.css';
@@ -17,6 +18,7 @@ function App() {
   const [exportDirectory, setExportDirectory] = useState<string>('simulation_results');
   const [simulationId, setSimulationId] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [showQuickReference, setShowQuickReference] = useState(false);
 
   // Load template on mount
   useEffect(() => {
@@ -85,8 +87,21 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Generic Discrete Event Simulation Engine</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1>Generic Discrete Event Simulation Engine</h1>
+          <button 
+            onClick={() => setShowQuickReference(true)}
+            className="guide-button-small"
+            style={{ fontSize: '1rem', padding: '0.75rem 1.5rem' }}
+          >
+            📖 What-If Analysis Guide
+          </button>
+        </div>
       </header>
+
+      {showQuickReference && (
+        <WhatIfQuickReference onClose={() => setShowQuickReference(false)} />
+      )}
 
       <main className="app-main">
         <div className="left-panel">
