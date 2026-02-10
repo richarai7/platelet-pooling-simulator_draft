@@ -4,11 +4,13 @@
 
 ## 🚀 Quick Start
 
-**New to this project?** See **[HOW_TO_RUN.md](HOW_TO_RUN.md)** for complete step-by-step instructions on:
-- Installing dependencies
-- Running your first simulation
-- Starting the API server
-- Using the web UI
+**New to this project?**
+- **[QUICK_START.md](QUICK_START.md)** - Get running in 2 minutes
+- **[HOW_TO_RUN.md](HOW_TO_RUN.md)** - Complete instructions for all features:
+  - Installing dependencies
+  - Running simulations
+  - Starting the API server
+  - Using the web UI
 
 ## Overview
 

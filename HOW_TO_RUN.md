@@ -438,6 +438,6 @@ If you encounter issues:
 2. Review error messages carefully
 3. Ensure all prerequisites are installed
 4. Check that you're in the correct directory
-5. Try the simplest example first (`simple_debug.py`)
+5. Try the simplest example first (unit tests or `debug_minimal.py`)
 
 For configuration help, see `examples/CONFIG-TUTORIAL.md`
