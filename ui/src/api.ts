@@ -29,14 +29,32 @@ export async function getTemplate(): Promise<SimulationConfig> {
   return fetchJSON<SimulationConfig>(`${API_BASE_URL}/templates/platelet-pooling-multi-batch`);
 }
 
-export async function runSimulation(config: SimulationConfig): Promise<SimulationResults> {
-  const response = await fetchJSON<{ results: SimulationResults }>(
+export async function runSimulation(
+  config: SimulationConfig,
+  runName?: string,
+  simulationName?: string,
+  exportToJson: boolean = true,
+  exportDirectory?: string
+): Promise<SimulationResults> {
+  const response = await fetchJSON<{ results: SimulationResults; json_export_path?: string }>(
     `${API_BASE_URL}/simulations/run`,
     {
       method: 'POST',
-      body: JSON.stringify({ config }),
+      body: JSON.stringify({ 
+        config,
+        run_name: runName,
+        simulation_name: simulationName,
+        export_to_json: exportToJson,
+        export_directory: exportDirectory
+      }),
     }
   );
+  
+  // Add json export path to results if available
+  if (response.json_export_path) {
+    response.results.json_export_path = response.json_export_path;
+  }
+  
   return response.results;
 }
 

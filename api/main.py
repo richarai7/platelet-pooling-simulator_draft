@@ -274,7 +274,61 @@ def run_simulation(request: SimulationRunRequest):
         
         try:
             results = engine.run()
-            return SimulationResultsResponse(results=results)
+            
+            # Add run metadata to results
+            if not results.get('metadata'):
+                results['metadata'] = {}
+            
+            results['metadata']['simulation_id'] = sim_id
+            if request.run_name:
+                results['metadata']['run_name'] = request.run_name
+            if request.simulation_name:
+                results['metadata']['simulation_name'] = request.simulation_name
+            
+            # Export to JSON if requested
+            json_export_path = None
+            if request.export_to_json:
+                import os
+                
+                # Determine export directory
+                export_dir = request.export_directory or "simulation_results"
+                os.makedirs(export_dir, exist_ok=True)
+                
+                # Generate filename with metadata
+                filename_parts = []
+                if request.simulation_name:
+                    filename_parts.append(request.simulation_name.replace(' ', '_'))
+                if request.run_name:
+                    filename_parts.append(request.run_name.replace(' ', '_'))
+                filename_parts.append(sim_id)
+                
+                filename = '_'.join(filename_parts) + '.json'
+                json_export_path = os.path.join(export_dir, filename)
+                
+                # Write results to JSON file
+                with open(json_export_path, 'w') as f:
+                    json.dump(results, f, indent=2, default=str)
+                
+                logger.info(f"Results exported to {json_export_path}")
+                results['metadata']['json_export_path'] = json_export_path
+            
+            # Save to database if results repository is available
+            try:
+                results_repo.save(
+                    simulation_id=sim_id,
+                    config=request.config,
+                    results=results,
+                    run_name=request.run_name or sim_id,
+                    simulation_name=request.simulation_name
+                )
+                logger.info(f"Results saved to database for {sim_id}")
+            except Exception as db_error:
+                logger.warning(f"Failed to save to database: {db_error}")
+            
+            return SimulationResultsResponse(
+                results=results,
+                json_export_path=json_export_path
+            )
         finally:
             # Remove from active simulations when complete or cancelled
             active_simulations.pop(sim_id, None)

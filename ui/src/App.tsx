@@ -11,6 +11,10 @@ function App() {
   const [results, setResults] = useState<SimulationResults | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [runName, setRunName] = useState<string>('');
+  const [simulationName, setSimulationName] = useState<string>('');
+  const [exportToJson, setExportToJson] = useState<boolean>(true);
+  const [exportDirectory, setExportDirectory] = useState<string>('simulation_results');
 
   // Load template on mount
   useEffect(() => {
@@ -32,7 +36,13 @@ function App() {
     setError(null);
     setResults(null);
     try {
-      const simulationResults = await runSimulation(config);
+      const simulationResults = await runSimulation(
+        config,
+        runName || undefined,
+        simulationName || undefined,
+        exportToJson,
+        exportDirectory || undefined
+      );
       setResults(simulationResults);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Simulation failed');
@@ -58,6 +68,14 @@ function App() {
             onRunSimulation={handleRunSimulation}
             isRunning={loading}
             results={results}
+            runName={runName}
+            setRunName={setRunName}
+            simulationName={simulationName}
+            setSimulationName={setSimulationName}
+            exportToJson={exportToJson}
+            setExportToJson={setExportToJson}
+            exportDirectory={exportDirectory}
+            setExportDirectory={setExportDirectory}
           />
 
           <ConfigForm config={config} onChange={setConfig} />

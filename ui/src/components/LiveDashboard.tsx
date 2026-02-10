@@ -6,9 +6,30 @@ interface LiveDashboardProps {
   onRunSimulation: () => void;
   isRunning: boolean;
   results: any;
+  runName: string;
+  setRunName: (name: string) => void;
+  simulationName: string;
+  setSimulationName: (name: string) => void;
+  exportToJson: boolean;
+  setExportToJson: (enabled: boolean) => void;
+  exportDirectory: string;
+  setExportDirectory: (dir: string) => void;
 }
 
-export function LiveDashboard({ config, onRunSimulation, isRunning, results }: LiveDashboardProps) {
+export function LiveDashboard({ 
+  config, 
+  onRunSimulation, 
+  isRunning, 
+  results,
+  runName,
+  setRunName,
+  simulationName,
+  setSimulationName,
+  exportToJson,
+  setExportToJson,
+  exportDirectory,
+  setExportDirectory
+}: LiveDashboardProps) {
   const [currentTime, setCurrentTime] = useState(0);
   const [elapsedReal, setElapsedReal] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -59,6 +80,64 @@ export function LiveDashboard({ config, onRunSimulation, isRunning, results }: L
   return (
     <div className="live-dashboard">
       <h2>Simulation Control</h2>
+      
+      {/* Run Metadata Section */}
+      <div className="metadata-section">
+        <h3>Run Metadata</h3>
+        <div className="metadata-inputs">
+          <div className="input-group">
+            <label htmlFor="simulation-name">Simulation Name:</label>
+            <input
+              id="simulation-name"
+              type="text"
+              value={simulationName}
+              onChange={(e) => setSimulationName(e.target.value)}
+              placeholder="e.g., Platelet Processing"
+              disabled={isRunning}
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="run-name">Run Name:</label>
+            <input
+              id="run-name"
+              type="text"
+              value={runName}
+              onChange={(e) => setRunName(e.target.value)}
+              placeholder="e.g., Baseline Test"
+              disabled={isRunning}
+            />
+          </div>
+        </div>
+        
+        {/* Export Options */}
+        <div className="export-options">
+          <h4>Export Options</h4>
+          <div className="input-group checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                checked={exportToJson}
+                onChange={(e) => setExportToJson(e.target.checked)}
+                disabled={isRunning}
+              />
+              Export results to JSON file
+            </label>
+          </div>
+          {exportToJson && (
+            <div className="input-group">
+              <label htmlFor="export-dir">Export Directory:</label>
+              <input
+                id="export-dir"
+                type="text"
+                value={exportDirectory}
+                onChange={(e) => setExportDirectory(e.target.value)}
+                placeholder="simulation_results"
+                disabled={isRunning}
+              />
+            </div>
+          )}
+        </div>
+      </div>
       
       <div className="dashboard-controls">
         <button
