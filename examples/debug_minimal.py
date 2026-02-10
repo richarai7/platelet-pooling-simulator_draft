@@ -25,7 +25,7 @@ def main():
     print("DEBUG SIMULATION")
     print("=" * 60)
     
-    # Minimal configuration - NO FLOWS to start
+    # Minimal configuration - NO FLOWS (simplest working example)
     config = {
         "simulation": {
             "duration": 100,  # Just 100 seconds
@@ -40,16 +40,7 @@ def main():
                 "recovery_time_range": None  # No recovery time
             }
         ],
-        "flows": [
-            {
-                "flow_id": "test_flow",
-                "from_device": "machine_a",
-                "to_device": "machine_a",
-                "process_time_range": (10, 20),
-                "priority": 1,
-                "dependencies": None
-            }
-        ],  # ONE SIMPLE FLOW
+        "flows": [],  # NO FLOWS - Simplest possible simulation
         "output_options": {
             "include_history": False,
             "include_events": False
