@@ -58,8 +58,10 @@ class SimulationEngine:
         self._event_count = 0
         self._flow_executions: Dict[str, int] = {}
         
-        # Cancellation support
+        # Cancellation and pause support
         self._cancelled = False
+        self._paused = False
+        self._pause_requested_time: float = 0.0
         
         # Initialize device capacity tracking
         for device in self.config["devices"]:
@@ -102,6 +104,14 @@ class SimulationEngine:
         # Process events until duration reached or no more events
         duration = self.config["simulation"]["duration"]
         while self.scheduler.has_events() and not self._cancelled:
+            # Handle pause state
+            while self._paused and not self._cancelled:
+                time.sleep(0.1)  # Check pause state every 100ms
+                continue
+            
+            if self._cancelled:
+                break
+            
             next_event = self.scheduler.peek_next()
             if next_event and next_event.timestamp > duration:
                 break  # Exceeded simulation duration
@@ -493,6 +503,49 @@ class SimulationEngine:
         """
         self._cancelled = True
         logger.info("Simulation cancellation requested")
+    
+    def pause(self) -> None:
+        """
+        Request pause of running simulation.
+        
+        Only effective in real-time mode. Simulation will pause at next event processing.
+        """
+        if self.execution_mode == "real-time" or self.speed_multiplier > 0:
+            self._paused = True
+            self._pause_requested_time = time.time()
+            logger.info("Simulation pause requested")
+        else:
+            logger.warning("Pause not supported in accelerated mode")
+    
+    def resume(self) -> None:
+        """
+        Resume a paused simulation.
+        
+        Adjusts real-time tracking to account for pause duration.
+        """
+        if self._paused:
+            pause_duration = time.time() - self._pause_requested_time
+            self._real_time_start += pause_duration  # Adjust for pause time
+            self._paused = False
+            logger.info(f"Simulation resumed after {pause_duration:.2f}s pause")
+        else:
+            logger.warning("Simulation is not paused")
+    
+    def get_status(self) -> Dict[str, Any]:
+        """
+        Get current simulation status.
+        
+        Returns:
+            Dictionary with simulation state information
+        """
+        return {
+            "current_time": self.scheduler.current_time if hasattr(self, 'scheduler') else 0,
+            "event_count": self._event_count,
+            "is_running": hasattr(self, 'scheduler') and self.scheduler.has_events(),
+            "is_paused": self._paused,
+            "is_cancelled": self._cancelled,
+            "execution_mode": self.execution_mode
+        }
     
     def _schedule_device_recovery(self, device_id: str) -> None:
         """

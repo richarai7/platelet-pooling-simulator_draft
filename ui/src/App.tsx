@@ -3,7 +3,7 @@ import { ConfigForm } from './components/ConfigForm';
 import { Results } from './components/Results';
 import { LiveDashboard } from './components/LiveDashboard';
 import { SimulationConfig, SimulationResults } from './types';
-import { getTemplate, runSimulation } from './api';
+import { getTemplate, runSimulation, pauseSimulation, resumeSimulation } from './api';
 import './App.css';
 
 function App() {
@@ -15,6 +15,8 @@ function App() {
   const [simulationName, setSimulationName] = useState<string>('');
   const [exportToJson, setExportToJson] = useState<boolean>(true);
   const [exportDirectory, setExportDirectory] = useState<string>('simulation_results');
+  const [simulationId, setSimulationId] = useState<string | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   // Load template on mount
   useEffect(() => {
@@ -35,8 +37,9 @@ function App() {
     setLoading(true);
     setError(null);
     setResults(null);
+    setIsPaused(false);
     try {
-      const simulationResults = await runSimulation(
+      const { results: simulationResults, simulationId: simId } = await runSimulation(
         config,
         runName || undefined,
         simulationName || undefined,
@@ -44,10 +47,34 @@ function App() {
         exportDirectory || undefined
       );
       setResults(simulationResults);
+      setSimulationId(simId || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Simulation failed');
     } finally {
       setLoading(false);
+      setSimulationId(null);
+    }
+  };
+
+  const handlePause = async () => {
+    if (!simulationId) return;
+    
+    try {
+      await pauseSimulation(simulationId);
+      setIsPaused(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to pause');
+    }
+  };
+
+  const handleResume = async () => {
+    if (!simulationId) return;
+    
+    try {
+      await resumeSimulation(simulationId);
+      setIsPaused(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to resume');
     }
   };
 
@@ -66,7 +93,10 @@ function App() {
           <LiveDashboard 
             config={config}
             onRunSimulation={handleRunSimulation}
+            onPause={handlePause}
+            onResume={handleResume}
             isRunning={loading}
+            isPaused={isPaused}
             results={results}
             runName={runName}
             setRunName={setRunName}

@@ -35,8 +35,12 @@ export async function runSimulation(
   simulationName?: string,
   exportToJson: boolean = true,
   exportDirectory?: string
-): Promise<SimulationResults> {
-  const response = await fetchJSON<{ results: SimulationResults; json_export_path?: string }>(
+): Promise<{ results: SimulationResults; simulationId?: string }> {
+  const response = await fetchJSON<{ 
+    results: SimulationResults; 
+    json_export_path?: string;
+    simulation_id?: string;
+  }>(
     `${API_BASE_URL}/simulations/run`,
     {
       method: 'POST',
@@ -55,7 +59,26 @@ export async function runSimulation(
     response.results.json_export_path = response.json_export_path;
   }
   
-  return response.results;
+  return {
+    results: response.results,
+    simulationId: response.simulation_id
+  };
+}
+
+export async function pauseSimulation(simulationId: string): Promise<void> {
+  await fetchJSON(`${API_BASE_URL}/simulations/${simulationId}/pause`, {
+    method: 'POST',
+  });
+}
+
+export async function resumeSimulation(simulationId: string): Promise<void> {
+  await fetchJSON(`${API_BASE_URL}/simulations/${simulationId}/resume`, {
+    method: 'POST',
+  });
+}
+
+export async function getSimulationStatus(simulationId: string): Promise<any> {
+  return fetchJSON(`${API_BASE_URL}/simulations/${simulationId}/status`);
 }
 
 export async function saveScenario(

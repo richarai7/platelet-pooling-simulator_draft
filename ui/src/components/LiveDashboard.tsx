@@ -4,7 +4,10 @@ import { SimulationConfig } from '../types';
 interface LiveDashboardProps {
   config: SimulationConfig | null;
   onRunSimulation: () => void;
+  onPause: () => void;
+  onResume: () => void;
   isRunning: boolean;
+  isPaused: boolean;
   results: any;
   runName: string;
   setRunName: (name: string) => void;
@@ -18,8 +21,11 @@ interface LiveDashboardProps {
 
 export function LiveDashboard({ 
   config, 
-  onRunSimulation, 
-  isRunning, 
+  onRunSimulation,
+  onPause,
+  onResume,
+  isRunning,
+  isPaused,
   results,
   runName,
   setRunName,
@@ -32,7 +38,6 @@ export function LiveDashboard({
 }: LiveDashboardProps) {
   const [currentTime, setCurrentTime] = useState(0);
   const [elapsedReal, setElapsedReal] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     if (!isRunning) {
@@ -58,7 +63,11 @@ export function LiveDashboard({
   }, [isRunning, isPaused, config]);
 
   const handlePause = () => {
-    setIsPaused(!isPaused);
+    if (isPaused) {
+      onResume();
+    } else {
+      onPause();
+    }
   };
 
   const handleStop = () => {
@@ -68,7 +77,6 @@ export function LiveDashboard({
     if (window.confirm('Stop is not fully implemented. The simulation will continue running on the server. Reset UI anyway?')) {
       setCurrentTime(0);
       setElapsedReal(0);
-      setIsPaused(false);
       window.location.reload(); // Force page reload to reset everything
     }
   };

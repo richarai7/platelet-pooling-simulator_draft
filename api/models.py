@@ -81,3 +81,4 @@ class SimulationRunRequest(BaseModel):
 class SimulationResultsResponse(BaseModel):
     results: Dict[str, Any]
     json_export_path: Optional[str] = None
+    simulation_id: Optional[str] = None

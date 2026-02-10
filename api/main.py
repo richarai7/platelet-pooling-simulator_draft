@@ -327,7 +327,8 @@ def run_simulation(request: SimulationRunRequest):
             
             return SimulationResultsResponse(
                 results=results,
-                json_export_path=json_export_path
+                json_export_path=json_export_path,
+                simulation_id=sim_id
             )
         finally:
             # Remove from active simulations when complete or cancelled
@@ -464,6 +465,82 @@ def get_active_simulations():
         "active_count": len(active_simulations),
         "simulation_ids": list(active_simulations.keys())
     }
+
+
+@app.get("/simulations/{simulation_id}/status")
+def get_simulation_status(simulation_id: str):
+    """Get status of a running simulation"""
+    if simulation_id not in active_simulations:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Simulation {simulation_id} not found or already completed"
+        )
+    
+    try:
+        engine = active_simulations[simulation_id]
+        status_info = engine.get_status()
+        
+        return {
+            "simulation_id": simulation_id,
+            "status": status_info
+        }
+    except Exception as e:
+        logger.exception(f"Error getting simulation status {simulation_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get simulation status"
+        )
+
+
+@app.post("/simulations/{simulation_id}/pause")
+def pause_simulation(simulation_id: str):
+    """Pause a running simulation (real-time mode only)"""
+    if simulation_id not in active_simulations:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Simulation {simulation_id} not found or already completed"
+        )
+    
+    try:
+        engine = active_simulations[simulation_id]
+        engine.pause()
+        logger.info(f"Pause requested for simulation {simulation_id}")
+        
+        return {
+            "message": f"Simulation {simulation_id} pause requested",
+            "note": "Only effective in real-time mode. Simulation will pause at next event."
+        }
+    except Exception as e:
+        logger.exception(f"Error pausing simulation {simulation_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to pause simulation"
+        )
+
+
+@app.post("/simulations/{simulation_id}/resume")
+def resume_simulation(simulation_id: str):
+    """Resume a paused simulation"""
+    if simulation_id not in active_simulations:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Simulation {simulation_id} not found or already completed"
+        )
+    
+    try:
+        engine = active_simulations[simulation_id]
+        engine.resume()
+        logger.info(f"Resume requested for simulation {simulation_id}")
+        
+        return {
+            "message": f"Simulation {simulation_id} resumed"
+        }
+    except Exception as e:
+        logger.exception(f"Error resuming simulation {simulation_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to resume simulation"
+        )
 
 
 @app.post("/simulations/{simulation_id}/cancel")
