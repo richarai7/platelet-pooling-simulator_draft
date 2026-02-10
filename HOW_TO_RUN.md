@@ -220,11 +220,14 @@ Open your browser to:
 ### 4. Test API Endpoints
 
 ```bash
-# Health check
-curl http://localhost:8000/health
+# Check root endpoint
+curl http://localhost:8000/
 
-# Get platelet template
-curl http://localhost:8000/api/templates/platelet
+# Get platelet pooling template
+curl http://localhost:8000/templates/platelet-pooling
+
+# Get multi-batch template
+curl http://localhost:8000/templates/platelet-pooling-multi-batch
 ```
 
 ## Running the Web UI
