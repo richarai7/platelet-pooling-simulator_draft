@@ -1,28 +1,34 @@
 """
-Quick Start Example - Minimal Working Simulation
-This is the simplest example to verify the simulation engine is working.
+Debug version of quick start to see what's happening
 """
 
 from pathlib import Path
 import sys
+import logging
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+# Enable debug logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 from simulation_engine import SimulationEngine
 
 
 def main():
-    """Run a minimal simulation to test the engine."""
+    """Run a minimal simulation with debug logging."""
     
     print("=" * 60)
-    print("QUICK START SIMULATION")
+    print("DEBUG SIMULATION")
     print("=" * 60)
     
-    # Minimal configuration with capacity > 1
+    # Minimal configuration - NO FLOWS to start
     config = {
         "simulation": {
-            "duration": 1000,  # 1000 seconds
+            "duration": 100,  # Just 100 seconds
             "random_seed": 42,
             "execution_mode": "accelerated"
         },
@@ -30,26 +36,20 @@ def main():
             {
                 "id": "machine_a",
                 "type": "machine",
-                "capacity": 2,  # Increased capacity
-                "recovery_time_range": None  # No recovery time for simplicity
-            },
-            {
-                "id": "machine_b",
-                "type": "machine",
-                "capacity": 2,  # Increased capacity
-                "recovery_time_range": None
+                "capacity": 1,
+                "recovery_time_range": None  # No recovery time
             }
         ],
         "flows": [
             {
-                "flow_id": "process_step",
+                "flow_id": "test_flow",
                 "from_device": "machine_a",
-                "to_device": "machine_b",  # Different device
-                "process_time_range": (50, 100),
+                "to_device": "machine_a",
+                "process_time_range": (10, 20),
                 "priority": 1,
                 "dependencies": None
             }
-        ],
+        ],  # ONE SIMPLE FLOW
         "output_options": {
             "include_history": False,
             "include_events": False
@@ -74,7 +74,6 @@ def main():
     print(f"   Simulation Time: {results['summary']['simulation_time_seconds']} seconds")
     print(f"   Execution Time: {results['summary']['execution_time_seconds']:.3f} seconds")
     
-    print(f"\n✓ Success! The simulation engine is working correctly.")
     print("=" * 60)
     
     return results
