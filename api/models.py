@@ -72,7 +72,13 @@ class ScenarioResponse(BaseModel):
 
 class SimulationRunRequest(BaseModel):
     config: Dict[str, Any]
+    run_name: Optional[str] = None
+    simulation_name: Optional[str] = None
+    export_to_json: bool = True
+    export_directory: Optional[str] = None
 
 
 class SimulationResultsResponse(BaseModel):
     results: Dict[str, Any]
+    json_export_path: Optional[str] = None
+    simulation_id: Optional[str] = None

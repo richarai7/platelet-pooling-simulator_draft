@@ -188,27 +188,48 @@ class ResultsRepository:
             )
             conn.commit()
 
-    def save(self, results: Dict[str, Any], scenario_name: Optional[str] = None) -> str:
+    def save(
+        self, 
+        simulation_id: str,
+        config: Dict[str, Any],
+        results: Dict[str, Any], 
+        run_name: Optional[str] = None,
+        simulation_name: Optional[str] = None
+    ) -> str:
         """Save simulation results to database."""
-        metadata = results["metadata"]
-        summary = results["summary"]
-        simulation_id = metadata["simulation_id"]
+        metadata = results.get("metadata", {})
+        summary = results.get("summary", {})
+        
+        # Use provided simulation_id or fallback to metadata
+        sim_id = simulation_id or metadata.get("simulation_id", "unknown")
+        
+        # Add run metadata to metadata dict
+        if run_name:
+            metadata["run_name"] = run_name
+        if simulation_name:
+            metadata["simulation_name"] = simulation_name
 
         conn = None
         try:
             conn = sqlite3.connect(self.db_path)
             conn.execute(
-                """INSERT INTO simulation_results (
+                """INSERT OR REPLACE INTO simulation_results (
                     simulation_id, scenario_name, duration, random_seed,
                     total_events, total_flows_completed, devices_count,
                     simulation_time_seconds, execution_time_seconds,
                     completed_at, metadata_json
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
-                    simulation_id, scenario_name, metadata["duration"], metadata["random_seed"],
-                    summary["total_events"], summary["total_flows_completed"],
-                    summary["devices_count"], summary["simulation_time_seconds"],
-                    summary["execution_time_seconds"], metadata["completed_at"],
+                    sim_id, 
+                    simulation_name or metadata.get("scenario_name"),
+                    metadata.get("duration", config.get("simulation", {}).get("duration", 0)),
+                    metadata.get("random_seed", config.get("simulation", {}).get("random_seed", 0)),
+                    summary.get("total_events", 0), 
+                    summary.get("total_flows_completed", 0),
+                    summary.get("devices_count", len(config.get("devices", []))),
+                    summary.get("simulation_time_seconds", 0),
+                    summary.get("execution_time_seconds", 0),
+                    metadata.get("completed_at", datetime.now().isoformat()),
                     json.dumps(metadata),
                 ),
             )
@@ -221,7 +242,7 @@ class ResultsRepository:
                             from_state, to_state, event
                         ) VALUES (?, ?, ?, ?, ?, ?)""",
                         (
-                            simulation_id, event["device_id"], event["timestamp"],
+                            sim_id, event["device_id"], event["timestamp"],
                             event["from_state"], event["to_state"], event["event"],
                         ),
                     )
@@ -230,11 +251,11 @@ class ResultsRepository:
                 for flow in results["flows_executed"]:
                     conn.execute(
                         "INSERT INTO flow_executions (simulation_id, flow_id, execution_count) VALUES (?, ?, ?)",
-                        (simulation_id, flow["flow_id"], flow["execution_count"]),
+                        (sim_id, flow["flow_id"], flow["execution_count"]),
                     )
 
             conn.commit()
-            return simulation_id
+            return sim_id
         finally:
             if conn:
                 conn.close()

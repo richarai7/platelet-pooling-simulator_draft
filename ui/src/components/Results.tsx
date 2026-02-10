@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SimulationResults } from '../types';
 
 interface ResultsProps {
@@ -6,18 +6,92 @@ interface ResultsProps {
 }
 
 export function Results({ results }: ResultsProps) {
+  const [showGuide, setShowGuide] = useState(false);
+
   if (!results) {
     return (
       <div className="results">
         <h2>Simulation Results</h2>
-        <p>Run a simulation to see results here.</p>
+        <div className="guide-prompt">
+          <p>Run a simulation to see results here.</p>
+          <button 
+            onClick={() => setShowGuide(!showGuide)}
+            className="guide-button"
+          >
+            📖 What-If Analysis Guide
+          </button>
+          {showGuide && (
+            <div className="guide-panel">
+              <h3>8 What-If Analysis Capabilities</h3>
+              <ol>
+                <li><strong>Staff Allocation</strong> - Test different staffing levels (set type="person")</li>
+                <li><strong>Device Utilization</strong> - Identify bottlenecks and optimize equipment</li>
+                <li><strong>Supply Variation</strong> - Model uncertainty with process_time_range</li>
+                <li><strong>Process Order</strong> - Adjust dependencies and priorities</li>
+                <li><strong>Product Release</strong> - Measure throughput and output</li>
+                <li><strong>Constraints</strong> - Model capacity limits, gates, and recovery times</li>
+                <li><strong>Outcome Forecasting</strong> - Predict future capacity needs</li>
+                <li><strong>Capacity Forecasting</strong> - Test different capacity scenarios</li>
+              </ol>
+              <p><em>See WHAT_IF_ANALYSIS_GUIDE.md for detailed instructions on using each capability.</em></p>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
 
   return (
     <div className="results">
-      <h2>Simulation Results</h2>
+      <div className="results-header">
+        <h2>Simulation Results</h2>
+        <button 
+          onClick={() => setShowGuide(!showGuide)}
+          className="guide-button-small"
+        >
+          {showGuide ? '✖ Close Guide' : '📖 Analysis Guide'}
+        </button>
+      </div>
+
+      {showGuide && (
+        <div className="guide-panel active">
+          <h3>What-If Analysis Quick Reference</h3>
+          <div className="guide-grid">
+            <div className="guide-item">
+              <strong>1. Staff Allocation</strong>
+              <p>Check staff utilization below. Red bars (&gt;85%) = overworked.</p>
+            </div>
+            <div className="guide-item">
+              <strong>2. Device Utilization</strong>
+              <p>See Device Utilization section. Bottleneck shows the constraint.</p>
+            </div>
+            <div className="guide-item">
+              <strong>3. Supply Variation</strong>
+              <p>Compare runs with different random seeds to see variation impact.</p>
+            </div>
+            <div className="guide-item">
+              <strong>4. Process Order</strong>
+              <p>Modify flow dependencies and compare cycle times.</p>
+            </div>
+            <div className="guide-item">
+              <strong>5. Product Release</strong>
+              <p>See Total Units Created and Current Throughput metrics.</p>
+            </div>
+            <div className="guide-item">
+              <strong>6. Constraints</strong>
+              <p>Check capacity limits and constraint violations below.</p>
+            </div>
+            <div className="guide-item">
+              <strong>7. Outcome Forecasting</strong>
+              <p>Review Optimization Suggestions for future capacity needs.</p>
+            </div>
+            <div className="guide-item">
+              <strong>8. Capacity Forecasting</strong>
+              <p>Test multiple runs with different device capacities and compare.</p>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Run Name and Simulation Name */}
       {results.kpis && (
@@ -37,69 +111,268 @@ export function Results({ results }: ResultsProps) {
         </section>
       )}
 
-      {/* KPIs Section */}
+      {/* KPIs Section - Enhanced for 8 Capabilities */}
+      {results.kpis && (
+        <>
+          {/* Capability 1: Staff Allocation Optimization */}
+          <section className="results-section capability-section">
+            <h3>🧑‍🔬 1. Staff Allocation Analysis</h3>
+            {results.kpis.staff_count !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Total Staff:</span>
+                <span className="kpi-value">{results.kpis.staff_count}</span>
+              </div>
+            )}
+            {results.kpis.staff_utilization !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Staff Utilization:</span>
+                <span className="kpi-value">{results.kpis.staff_utilization}%</span>
+              </div>
+            )}
+            {results.kpis.capacity_utilization_per_device && (
+              <div className="kpi-subsection">
+                <h4>Staff/Device Breakdown</h4>
+                <div className="utilization-list">
+                  {Object.entries(results.kpis.capacity_utilization_per_device).map(([device, util]) => (
+                    <div key={device} className="utilization-item">
+                      <span className="device-name">{device}:</span>
+                      <div className="utilization-bar">
+                        <div 
+                          className="utilization-fill" 
+                          style={{ 
+                            width: `${util}%`,
+                            backgroundColor: util > 85 ? '#ef4444' : util > 60 ? '#f59e0b' : '#10b981'
+                          }}
+                        />
+                      </div>
+                      <span className="utilization-value">{util.toFixed(1)}%</span>
+                      {util > 85 && <span className="warning-badge">⚠️ Overloaded</span>}
+                      {util < 30 && <span className="info-badge">ℹ️ Underutilized</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* Capability 2: Device Utilization Optimization */}
+          <section className="results-section capability-section">
+            <h3>🏭 2. Device Utilization Optimization</h3>
+            
+            {/* Device Health */}
+            {results.kpis.device_health && (
+              <div className="kpi-subsection">
+                <h4>Device Health Status</h4>
+                <div className="device-health-grid">
+                  {Object.entries(results.kpis.device_health).map(([device, health]) => (
+                    <div key={device} className={`health-badge health-${health.toLowerCase()}`}>
+                      <span className="device-name">{device}</span>
+                      <span className={`health-status ${health.toLowerCase()}`}>{health}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Bottleneck */}
+            {results.kpis.resource_bottleneck && (
+              <div className="kpi-subsection bottleneck-highlight">
+                <h4>⚠️ Bottleneck Identified</h4>
+                <p className="bottleneck-text">
+                  <strong>{results.kpis.resource_bottleneck}</strong> is constraining your throughput.
+                </p>
+                <p className="help-text">
+                  💡 Focus optimization efforts here for maximum impact.
+                </p>
+              </div>
+            )}
+
+            {/* Idle Time */}
+            {results.kpis.idle_time_percentage !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Average Idle Time:</span>
+                <span className="kpi-value">{results.kpis.idle_time_percentage}%</span>
+              </div>
+            )}
+          </section>
+
+          {/* Capability 3: Supply Variation Analysis */}
+          <section className="results-section capability-section">
+            <h3>📊 3. Supply Variation Analysis</h3>
+            {results.kpis.supply_variation !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Supply Variation:</span>
+                <span className="kpi-value">{results.kpis.supply_variation}</span>
+              </div>
+            )}
+            {results.kpis.input_supply_rate !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Input Supply Rate:</span>
+                <span className="kpi-value">{results.kpis.input_supply_rate}</span>
+              </div>
+            )}
+            {results.metadata?.random_seed !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Random Seed Used:</span>
+                <span className="kpi-value">{results.metadata.random_seed}</span>
+                <span className="help-text">Run with different seeds to test variability</span>
+              </div>
+            )}
+          </section>
+
+          {/* Capability 4: Process Order Adjustments */}
+          <section className="results-section capability-section">
+            <h3>🔄 4. Process Order Impact</h3>
+            {results.kpis.average_cycle_time !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Average Cycle Time:</span>
+                <span className="kpi-value">{results.kpis.average_cycle_time}s</span>
+              </div>
+            )}
+            {results.kpis.time_to_first_unit !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Time to First Unit:</span>
+                <span className="kpi-value">{results.kpis.time_to_first_unit}s</span>
+              </div>
+            )}
+            <p className="help-text">
+              💡 Modify flow dependencies to test different process sequences
+            </p>
+          </section>
+
+          {/* Capability 5: Product Release Measurement */}
+          <section className="results-section capability-section">
+            <h3>📦 5. Product Release Measurement</h3>
+            {results.kpis.total_units_created !== undefined && (
+              <div className="kpi-row highlight">
+                <span className="kpi-label">Total Units Created:</span>
+                <span className="kpi-value large">{results.kpis.total_units_created}</span>
+              </div>
+            )}
+            {results.kpis.product_release_volume !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Product Release Volume:</span>
+                <span className="kpi-value">{results.kpis.product_release_volume}</span>
+              </div>
+            )}
+            {results.kpis.current_throughput !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Current Throughput:</span>
+                <span className="kpi-value">{results.kpis.current_throughput} units/hour</span>
+              </div>
+            )}
+            {results.kpis.peak_throughput !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Peak Throughput:</span>
+                <span className="kpi-value">{results.kpis.peak_throughput} units/hour</span>
+              </div>
+            )}
+          </section>
+
+          {/* Capability 6: Constraint Modelling */}
+          <section className="results-section capability-section">
+            <h3>🚧 6. Constraint Modeling</h3>
+            {results.kpis.constraint_violations !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Constraint Violations:</span>
+                <span className="kpi-value">{results.kpis.constraint_violations}</span>
+              </div>
+            )}
+            {results.kpis.max_queue_length !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Max Queue Length:</span>
+                <span className="kpi-value">{results.kpis.max_queue_length}</span>
+              </div>
+            )}
+            {results.kpis.units_in_queue !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Current Units in Queue:</span>
+                <span className="kpi-value">{results.kpis.units_in_queue}</span>
+              </div>
+            )}
+            <p className="help-text">
+              💡 Configure capacity limits, gates, and recovery times to model constraints
+            </p>
+          </section>
+
+          {/* Capability 7: Outcome Forecasting */}
+          <section className="results-section capability-section">
+            <h3>🔮 7. Outcome Forecasting</h3>
+            {results.kpis.demand_forecast !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Demand Forecast:</span>
+                <span className="kpi-value">{results.kpis.demand_forecast}</span>
+              </div>
+            )}
+            {results.kpis.optimization_suggestions && results.kpis.optimization_suggestions.length > 0 && (
+              <div className="kpi-subsection">
+                <h4>💡 Optimization Suggestions</h4>
+                <ul className="suggestions-list">
+                  {results.kpis.optimization_suggestions.map((suggestion, idx) => (
+                    <li key={idx}>{suggestion}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
+
+          {/* Capability 8: Productivity and Capacity Forecasting */}
+          <section className="results-section capability-section">
+            <h3>📈 8. Productivity & Capacity Forecasting</h3>
+            {results.kpis.comparison_to_baseline !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">vs Baseline:</span>
+                <span className="kpi-value">{results.kpis.comparison_to_baseline}</span>
+              </div>
+            )}
+            {results.kpis.cost_per_unit !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Cost per Unit:</span>
+                <span className="kpi-value">${results.kpis.cost_per_unit}</span>
+              </div>
+            )}
+            {results.kpis.total_operating_cost !== undefined && (
+              <div className="kpi-row">
+                <span className="kpi-label">Total Operating Cost:</span>
+                <span className="kpi-value">${results.kpis.total_operating_cost}</span>
+              </div>
+            )}
+            <div className="capacity-test-helper">
+              <p className="help-text">
+                💡 <strong>Quick Capacity Test:</strong> Use different device capacities and compare these metrics:
+              </p>
+              <ul className="help-list">
+                <li>Total Units Created (higher = better)</li>
+                <li>Average Cycle Time (lower = better)</li>
+                <li>Cost per Unit (lower = better)</li>
+              </ul>
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* Legacy KPI Section (for any KPIs not covered above) */}
       {results.kpis && (
         <section className="results-section">
-          <h3>Key Performance Indicators</h3>
+          <h3>Additional Metrics</h3>
           
-          {/* Device Health */}
-          {results.kpis.device_health && (
-            <div className="kpi-subsection">
-              <h4>Device Health</h4>
-              <div className="device-health-grid">
-                {Object.entries(results.kpis.device_health).map(([device, health]) => (
-                  <div key={device} className={`health-badge health-${health.toLowerCase()}`}>
-                    <span className="device-name">{device}</span>
-                    <span className={`health-status ${health.toLowerCase()}`}>{health}</span>
-                  </div>
-                ))}
-              </div>
+          {/* Quality Metrics */}
+          {results.kpis.quality_pass_rate !== undefined && (
+            <div className="kpi-row">
+              <span className="kpi-label">Quality Pass Rate:</span>
+              <span className="kpi-value">{results.kpis.quality_pass_rate}%</span>
             </div>
           )}
-
-          {/* Capacity Utilization */}
-          {results.kpis.capacity_utilization_per_device && (
-            <div className="kpi-subsection">
-              <h4>Device Utilization</h4>
-              <div className="utilization-list">
-                {Object.entries(results.kpis.capacity_utilization_per_device).map(([device, util]) => (
-                  <div key={device} className="utilization-item">
-                    <span className="device-name">{device}:</span>
-                    <div className="utilization-bar">
-                      <div 
-                        className="utilization-fill" 
-                        style={{ 
-                          width: `${util}%`,
-                          backgroundColor: util > 85 ? '#ef4444' : util > 60 ? '#f59e0b' : '#10b981'
-                        }}
-                      />
-                    </div>
-                    <span className="utilization-value">{util.toFixed(1)}%</span>
-                  </div>
-                ))}
-              </div>
+          {results.kpis.failed_units_count !== undefined && (
+            <div className="kpi-row">
+              <span className="kpi-label">Failed Units:</span>
+              <span className="kpi-value">{results.kpis.failed_units_count}</span>
             </div>
           )}
-
-          {/* Bottleneck */}
-          {results.kpis.resource_bottleneck && (
-            <div className="kpi-subsection">
-              <h4>Bottleneck Analysis</h4>
-              <p className="bottleneck-text">
-                <strong>Identified Bottleneck:</strong> {results.kpis.resource_bottleneck}
-              </p>
-            </div>
-          )}
-
-          {/* Optimization Suggestions */}
-          {results.kpis.optimization_suggestions && results.kpis.optimization_suggestions.length > 0 && (
-            <div className="kpi-subsection">
-              <h4>Optimization Suggestions</h4>
-              <ul className="suggestions-list">
-                {results.kpis.optimization_suggestions.map((suggestion, idx) => (
-                  <li key={idx}>{suggestion}</li>
-                ))}
-              </ul>
+          {results.kpis.waste_rate !== undefined && (
+            <div className="kpi-row">
+              <span className="kpi-label">Waste Rate:</span>
+              <span className="kpi-value">{results.kpis.waste_rate}%</span>
             </div>
           )}
         </section>

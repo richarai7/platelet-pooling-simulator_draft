@@ -50,6 +50,10 @@ export interface SimulationResults {
     random_seed: number;
     start_time?: string;
     end_time?: string;
+    simulation_id?: string;
+    run_name?: string;
+    simulation_name?: string;
+    json_export_path?: string;
   };
   summary?: {
     total_events?: number;
@@ -67,4 +71,5 @@ export interface SimulationResults {
     optimization_suggestions?: string[];
     [key: string]: any;
   };
+  json_export_path?: string;
 }
