@@ -2,6 +2,14 @@
 
 **Domain-agnostic simulation engine for operational workflow modeling across ANY industry.**
 
+## 🚀 Quick Start
+
+**New to this project?** See **[HOW_TO_RUN.md](HOW_TO_RUN.md)** for complete step-by-step instructions on:
+- Installing dependencies
+- Running your first simulation
+- Starting the API server
+- Using the web UI
+
 ## Overview
 
 This simulation engine provides a pure-Python, configuration-driven discrete event simulation (DES) framework. Change your configuration to simulate healthcare, manufacturing, logistics, or any industry - no code changes required.
