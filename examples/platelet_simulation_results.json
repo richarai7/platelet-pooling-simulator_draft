@@ -1,0 +1,428 @@
+{
+  "metadata": {
+    "simulation_id": "sim_20260206_125038",
+    "duration": 129600,
+    "random_seed": 42,
+    "completed_at": "2026-02-06T12:50:38.406721",
+    "engine_version": "0.1.0"
+  },
+  "summary": {
+    "total_events": 32,
+    "total_flows_completed": 16,
+    "devices_count": 12,
+    "simulation_time_seconds": 2241.8827284984072,
+    "execution_time_seconds": 0.0
+  },
+  "device_states": [
+    {
+      "device_id": "reception_01",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "separator_01",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "separator_02",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "pooling_station_01",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "pooling_station_02",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "testing_lab_01",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "testing_lab_02",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "quality_check",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "storage_unit",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "packaging_station",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "waste_management",
+      "final_state": "Idle",
+      "state_changes": 0
+    },
+    {
+      "device_id": "post_processing",
+      "final_state": "Idle",
+      "state_changes": 0
+    }
+  ],
+  "state_history": [
+    {
+      "device_id": "reception_01",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "separator_01",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "separator_02",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "pooling_station_01",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "pooling_station_02",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "testing_lab_01",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "testing_lab_02",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "storage_unit",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "packaging_station",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 92.696488836193
+    },
+    {
+      "device_id": "storage_unit",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 143.86051808239782
+    },
+    {
+      "device_id": "reception_01",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 307.5032265668001
+    },
+    {
+      "device_id": "packaging_station",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 416.9791988003142
+    },
+    {
+      "device_id": "pooling_station_02",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 608.9391658314211
+    },
+    {
+      "device_id": "pooling_station_01",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 626.0816497888248
+    },
+    {
+      "device_id": "testing_lab_01",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 965.591392441081
+    },
+    {
+      "device_id": "testing_lab_02",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 1051.6065864310087
+    },
+    {
+      "device_id": "separator_01",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 1933.9264428892936
+    },
+    {
+      "device_id": "separator_02",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2206.0196924537468
+    }
+  ],
+  "event_timeline": [
+    {
+      "device_id": "reception_01",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "separator_01",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "separator_02",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "pooling_station_01",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "pooling_station_02",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "testing_lab_01",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "testing_lab_02",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "storage_unit",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "packaging_station",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 92.696488836193
+    },
+    {
+      "device_id": "storage_unit",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 143.86051808239782
+    },
+    {
+      "device_id": "reception_01",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 307.5032265668001
+    },
+    {
+      "device_id": "packaging_station",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 416.9791988003142
+    },
+    {
+      "device_id": "pooling_station_02",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 608.9391658314211
+    },
+    {
+      "device_id": "pooling_station_01",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 626.0816497888248
+    },
+    {
+      "device_id": "testing_lab_01",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 965.591392441081
+    },
+    {
+      "device_id": "testing_lab_02",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 1051.6065864310087
+    },
+    {
+      "device_id": "separator_01",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 1933.9264428892936
+    },
+    {
+      "device_id": "separator_02",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2206.0196924537468
+    }
+  ],
+  "flows_executed": [
+    {
+      "flow_id": "reception_to_sep1",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "reception_to_sep2",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "sep1_to_pool1",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "sep1_to_pool2",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "sep2_to_pool1",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "sep2_to_pool2",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "pool1_to_test1",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "pool1_to_test2",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "pool2_to_test1",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "pool2_to_test2",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "test1_to_quality",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "test2_to_quality",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "quality_to_storage",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "storage_to_packaging",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "packaging_to_post",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "quality_to_waste",
+      "execution_count": 1
+    }
+  ]
+}

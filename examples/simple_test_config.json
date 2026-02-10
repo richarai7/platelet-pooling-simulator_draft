@@ -1,0 +1,213 @@
+{
+  "simulation": {
+    "duration": 10000,
+    "random_seed": 42
+  },
+  "devices": [
+    {
+      "id": "centrifuge",
+      "type": "machine",
+      "capacity": 2
+    },
+    {
+      "id": "separator",
+      "type": "machine",
+      "capacity": 2
+    },
+    {
+      "id": "quality",
+      "type": "machine",
+      "capacity": 1
+    }
+  ],
+  "flows": [
+    {
+      "flow_id": "batch1_cent",
+      "from_device": "centrifuge",
+      "to_device": "separator",
+      "process_time_range": [
+        360,
+        360
+      ],
+      "priority": 1,
+      "dependencies": []
+    },
+    {
+      "flow_id": "batch1_sep",
+      "from_device": "separator",
+      "to_device": "quality",
+      "process_time_range": [
+        720,
+        720
+      ],
+      "priority": 1,
+      "dependencies": [
+        "batch1_cent"
+      ]
+    },
+    {
+      "flow_id": "batch1_qual",
+      "from_device": "quality",
+      "to_device": "quality",
+      "process_time_range": [
+        240,
+        240
+      ],
+      "priority": 1,
+      "dependencies": [
+        "batch1_sep"
+      ]
+    },
+    {
+      "flow_id": "batch2_cent",
+      "from_device": "centrifuge",
+      "to_device": "separator",
+      "process_time_range": [
+        360,
+        360
+      ],
+      "priority": 1,
+      "dependencies": []
+    },
+    {
+      "flow_id": "batch2_sep",
+      "from_device": "separator",
+      "to_device": "quality",
+      "process_time_range": [
+        720,
+        720
+      ],
+      "priority": 1,
+      "dependencies": [
+        "batch2_cent"
+      ]
+    },
+    {
+      "flow_id": "batch2_qual",
+      "from_device": "quality",
+      "to_device": "quality",
+      "process_time_range": [
+        240,
+        240
+      ],
+      "priority": 1,
+      "dependencies": [
+        "batch2_sep"
+      ]
+    },
+    {
+      "flow_id": "batch3_cent",
+      "from_device": "centrifuge",
+      "to_device": "separator",
+      "process_time_range": [
+        360,
+        360
+      ],
+      "priority": 1,
+      "dependencies": []
+    },
+    {
+      "flow_id": "batch3_sep",
+      "from_device": "separator",
+      "to_device": "quality",
+      "process_time_range": [
+        720,
+        720
+      ],
+      "priority": 1,
+      "dependencies": [
+        "batch3_cent"
+      ]
+    },
+    {
+      "flow_id": "batch3_qual",
+      "from_device": "quality",
+      "to_device": "quality",
+      "process_time_range": [
+        240,
+        240
+      ],
+      "priority": 1,
+      "dependencies": [
+        "batch3_sep"
+      ]
+    },
+    {
+      "flow_id": "batch4_cent",
+      "from_device": "centrifuge",
+      "to_device": "separator",
+      "process_time_range": [
+        360,
+        360
+      ],
+      "priority": 1,
+      "dependencies": []
+    },
+    {
+      "flow_id": "batch4_sep",
+      "from_device": "separator",
+      "to_device": "quality",
+      "process_time_range": [
+        720,
+        720
+      ],
+      "priority": 1,
+      "dependencies": [
+        "batch4_cent"
+      ]
+    },
+    {
+      "flow_id": "batch4_qual",
+      "from_device": "quality",
+      "to_device": "quality",
+      "process_time_range": [
+        240,
+        240
+      ],
+      "priority": 1,
+      "dependencies": [
+        "batch4_sep"
+      ]
+    },
+    {
+      "flow_id": "batch5_cent",
+      "from_device": "centrifuge",
+      "to_device": "separator",
+      "process_time_range": [
+        360,
+        360
+      ],
+      "priority": 1,
+      "dependencies": []
+    },
+    {
+      "flow_id": "batch5_sep",
+      "from_device": "separator",
+      "to_device": "quality",
+      "process_time_range": [
+        720,
+        720
+      ],
+      "priority": 1,
+      "dependencies": [
+        "batch5_cent"
+      ]
+    },
+    {
+      "flow_id": "batch5_qual",
+      "from_device": "quality",
+      "to_device": "quality",
+      "process_time_range": [
+        240,
+        240
+      ],
+      "priority": 1,
+      "dependencies": [
+        "batch5_sep"
+      ]
+    }
+  ],
+  "output_options": {
+    "include_history": true
+  }
+}

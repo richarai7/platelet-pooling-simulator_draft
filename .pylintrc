@@ -1,0 +1,52 @@
+[MASTER]
+# Python code to execute, usually for sys.path manipulation
+init-hook='import sys; sys.path.append("src")'
+
+[MESSAGES CONTROL]
+# Disable specific warnings
+disable=
+    C0111,  # missing-docstring (handled by type hints)
+    R0903,  # too-few-public-methods (dataclasses are fine)
+    R0913,  # too-many-arguments (simulation configs need many params)
+    W0212,  # protected-access (needed for testing)
+    C0103,  # invalid-name (allow single-letter vars in math)
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=100
+
+# String used as indentation unit
+indent-string='    '
+
+[BASIC]
+# Good variable names
+good-names=i,j,k,ex,Run,_,id,mu
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args=7
+
+# Maximum number of attributes for a class
+max-attributes=10
+
+# Minimum number of public methods for a class
+min-public-methods=1
+
+[IMPORTS]
+# Enforce import order
+known-third-party=simpy,pytest
+
+[SIMILARITIES]
+# Minimum lines number of a similarity
+min-similarity-lines=6
+
+[TYPECHECK]
+# List of members which are set dynamically
+generated-members=
+
+[REPORTS]
+# Set to yes to generate reports
+reports=no
+
+# Python expression for score evaluation
+evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)

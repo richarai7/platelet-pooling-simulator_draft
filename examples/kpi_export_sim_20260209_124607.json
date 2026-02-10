@@ -1,0 +1,155 @@
+{
+  "total_units_created": 197935,
+  "quality_pass_rate": 100.0,
+  "failed_units_count": 0,
+  "average_cycle_time": 0.0,
+  "current_throughput": 7125.726978615117,
+  "uniting_station_utilization": 0.0,
+  "testing_lab_utilization": 0.0,
+  "capacity_utilization_per_device": {
+    "centrifuge": 0.050000469981834085,
+    "separator": 0.10000093996366817,
+    "quality": 0.0
+  },
+  "units_processed": 197935,
+  "simulation_time_elapsed": 99999.06004516706,
+  "units_in_queue": 0,
+  "active_units_in_process": 0,
+  "run_name": "Baseline_Run_001",
+  "simulation_name": "Platelet Pooling - Baseline",
+  "unit_transfer_tracking": [],
+  "staff_count": 0,
+  "staff_utilization": 0.0,
+  "input_supply_rate": 0.07200067677384109,
+  "product_release_volume": 197935,
+  "total_operating_cost": 9898250,
+  "cost_per_unit": 50.007578245383584,
+  "waste_rate": 0.0,
+  "waste_cost": 0,
+  "expired_units": 0,
+  "test_results_breakdown": {
+    "passed": 197935,
+    "failed": 0,
+    "reasons": {}
+  },
+  "peak_throughput": 7125.726978615117,
+  "avg_wait_time_per_unit": 0.0,
+  "time_to_first_unit": 0.0,
+  "resource_bottleneck": "separator",
+  "max_queue_length": 0,
+  "idle_time_percentage": {
+    "centrifuge": 99.94999953001816,
+    "separator": 99.89999906003634,
+    "quality": 100.0
+  },
+  "comparison_to_baseline": {
+    "current": 7125.726978615117,
+    "baseline": 5.0,
+    "difference_pct": 142414.53957230234
+  },
+  "supply_variation": 0.0,
+  "constraint_violations": 0,
+  "demand_forecast": {
+    "current_rate": 7125.726978615117,
+    "projected_demand": 7838.299676476629,
+    "variance": 712.5726978615118
+  },
+  "optimization_suggestions": [
+    "Increase capacity at separator",
+    "Consider reducing centrifuge capacity (only 0.1% utilized)",
+    "Consider reducing separator capacity (only 0.1% utilized)",
+    "Consider reducing quality capacity (only 0.0% utilized)"
+  ],
+  "processing_station_count": 0,
+  "testing_station_count": 1,
+  "scenario_parameters": {
+    "duration": 100000,
+    "random_seed": 42,
+    "execution_mode": "accelerated",
+    "device_count": 3,
+    "flow_count": 6
+  },
+  "3d_visualization": {
+    "devices": [
+      {
+        "id": "centrifuge",
+        "type": "machine",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "capacity": 2,
+        "utilization": 0.050000469981834085
+      },
+      {
+        "id": "separator",
+        "type": "machine",
+        "position": [
+          100,
+          0,
+          0
+        ],
+        "capacity": 2,
+        "utilization": 0.10000093996366817
+      },
+      {
+        "id": "quality",
+        "type": "machine",
+        "position": [
+          200,
+          0,
+          0
+        ],
+        "capacity": 1,
+        "utilization": 0.0
+      }
+    ],
+    "flows": [
+      {
+        "from": "centrifuge",
+        "to": "separator",
+        "id": "batch1_centrifuge"
+      },
+      {
+        "from": "separator",
+        "to": "quality",
+        "id": "batch1_separator"
+      },
+      {
+        "from": "quality",
+        "to": "quality",
+        "id": "batch1_quality"
+      },
+      {
+        "from": "centrifuge",
+        "to": "separator",
+        "id": "batch2_centrifuge"
+      },
+      {
+        "from": "separator",
+        "to": "quality",
+        "id": "batch2_separator"
+      },
+      {
+        "from": "quality",
+        "to": "quality",
+        "id": "batch2_quality"
+      }
+    ]
+  },
+  "scenario_comparison": {
+    "scenario_id": "sim_20260209_124607",
+    "throughput": 7125.726978615117,
+    "cycle_time": 0.0,
+    "utilization": 0.050000469981834085,
+    "cost_per_unit": 50.007578245383584
+  },
+  "device_health": {
+    "centrifuge": "Healthy",
+    "separator": "Healthy",
+    "quality": "Healthy"
+  },
+  "export_timestamp": "2026-02-09T12:46:07.481218",
+  "simulation_id": "sim_20260209_124607"
+}
