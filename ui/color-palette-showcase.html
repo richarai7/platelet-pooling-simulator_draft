@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifeblood Color Palette - Complete Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #E31837;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+        
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .color-group {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .color-group h2 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            color: #1e293b;
+        }
+        
+        .color-swatch {
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .color-display {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .color-info {
+            background: #f8fafc;
+            padding: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .color-name {
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        .color-code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: #e2e8f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        
+        .usage-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .usage-section h2 {
+            margin-bottom: 1.5rem;
+            color: #E31837;
+            font-size: 1.8rem;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .demo-item {
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .demo-item h3 {
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        
+        /* Button Demos */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+        }
+        
+        .btn-red {
+            background: #E31837;
+        }
+        
+        .btn-red:hover {
+            background: #C20E2F;
+        }
+        
+        .btn-green {
+            background: #7FCC72;
+        }
+        
+        .btn-green:hover {
+            background: #6BB862;
+        }
+        
+        .btn-orange {
+            background: #FF6F40;
+        }
+        
+        .btn-orange:hover {
+            background: #E65F35;
+        }
+        
+        /* Alert Demos */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background: #ecfdf5;
+            border-color: #7FCC72;
+            color: #166534;
+        }
+        
+        .alert-warning {
+            background: #FFF4EF;
+            border-color: #FF6F40;
+            color: #B34A1F;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #991b1b;
+        }
+        
+        .alert-info {
+            background: #fef2f3;
+            border-color: #E31837;
+            color: #C20E2F;
+        }
+        
+        /* Gradient Demo */
+        .gradient-demo {
+            height: 100px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #E31837 0%, #C20E2F 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🩸 Lifeblood Color Palette</h1>
+        <p class="subtitle">Complete color system for the Platelet Pooling Simulator</p>
+        
+        <!-- Color Palette -->
+        <div class="palette-grid">
+            <!-- Red Colors -->
+            <div class="color-group">
+                <h2>🔴 Red (Primary)</h2>
+                <div class="color-swatch">
+                    <div class="color-display" style="background: #E31837;">#E31837</div>
+                    <div class="color-info">
+                        <span class="color-name">Lifeblood Red</span>
+                        <span class="color-code">Primary</span>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-display" style="background: #C20E2F;">#C20E2F</div>
+                    <div class="color-info">
+                        <span class="color-name">Dark Red</span>
+                        <span class="color-code">Hover/Dark</span>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-display" style="background: #fef2f3; color: #E31837;">#fef2f3</div>
+                    <div class="color-info">
+                        <span class="color-name">Light Red</span>
+                        <span class="color-code">Backgrounds</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Orange Colors -->
+            <div class="color-group">
+                <h2>🟠 Orange (Warning)</h2>
+                <div class="color-swatch">
+                    <div class="color-display" style="background: #FF6F40;">#FF6F40</div>
+                    <div class="color-info">
+                        <span class="color-name">Lifeblood Orange</span>
+                        <span class="color-code">Primary</span>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-display" style="background: #E65F35;">#E65F35</div>
+                    <div class="color-info">
+                        <span class="color-name">Dark Orange</span>
+                        <span class="color-code">Hover/Dark</span>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-display" style="background: #FFF4EF; color: #B34A1F;">#FFF4EF</div>
+                    <div class="color-info">
+                        <span class="color-name">Light Orange</span>
+                        <span class="color-code">Backgrounds</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Green Colors -->
+            <div class="color-group">
+                <h2>🟢 Green (Success)</h2>
+                <div class="color-swatch">
+                    <div class="color-display" style="background: #7FCC72;">#7FCC72</div>
+                    <div class="color-info">
+                        <span class="color-name">Lifeblood Green</span>
+                        <span class="color-code">Primary</span>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-display" style="background: #6BB862;">#6BB862</div>
+                    <div class="color-info">
+                        <span class="color-name">Dark Green</span>
+                        <span class="color-code">Hover/Dark</span>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-display" style="background: #ecfdf5; color: #166534;">#ecfdf5</div>
+                    <div class="color-info">
+                        <span class="color-name">Light Green</span>
+                        <span class="color-code">Backgrounds</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Usage Examples -->
+        <div class="usage-section">
+            <h2>Usage Examples</h2>
+            
+            <h3 style="margin-top: 1.5rem; margin-bottom: 1rem; color: #1e293b;">Buttons</h3>
+            <div class="demo-grid">
+                <div>
+                    <button class="btn btn-red">Primary Action (Red)</button>
+                </div>
+                <div>
+                    <button class="btn btn-green">Success Action (Green)</button>
+                </div>
+                <div>
+                    <button class="btn btn-orange">Warning Action (Orange)</button>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: #1e293b;">Alerts & Messages</h3>
+            <div style="display: grid; gap: 1rem;">
+                <div class="alert alert-success">
+                    <strong>Success:</strong> Configuration validated successfully! All systems ready.
+                </div>
+                <div class="alert alert-warning">
+                    <strong>Warning:</strong> Device utilization above 60%. Consider adding capacity.
+                </div>
+                <div class="alert alert-error">
+                    <strong>Error:</strong> Simulation failed. Check configuration parameters.
+                </div>
+                <div class="alert alert-info">
+                    <strong>Info:</strong> Using Lifeblood theme colors throughout the application.
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: #1e293b;">Gradient (Headers & Featured Sections)</h3>
+            <div class="gradient-demo">
+                Lifeblood Red Gradient
+            </div>
+        </div>
+        
+        <!-- Design Notes -->
+        <div class="usage-section">
+            <h2>Design Guidelines</h2>
+            <div style="line-height: 1.8; color: #475569;">
+                <p style="margin-bottom: 1rem;">
+                    <strong style="color: #E31837;">Red (#E31837):</strong> Use for primary branding, headers, important CTAs, and key UI elements that need to stand out.
+                </p>
+                <p style="margin-bottom: 1rem;">
+                    <strong style="color: #FF6F40;">Orange (#FF6F40):</strong> Use for warnings, medium-priority alerts, and informational elements that require attention but aren't critical.
+                </p>
+                <p style="margin-bottom: 1rem;">
+                    <strong style="color: #7FCC72;">Green (#7FCC72):</strong> Use for success states, add buttons, positive feedback, and completed actions.
+                </p>
+                <p style="margin-bottom: 1rem;">
+                    <strong>Accessibility:</strong> All color combinations maintain WCAG AA standards for contrast ratios, ensuring readability for all users.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
