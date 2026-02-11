@@ -18,7 +18,7 @@ body {
 }
 
 .app-header {
-  background-color: #2c3e50;
+  background-color: #E31837;
   color: white;
   padding: 1.5rem 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -50,13 +50,13 @@ body {
 .results h2 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  color: #2c3e50;
+  color: #E31837;
 }
 
 /* KPI Styles */
 .simulation-info {
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #E31837 0%, #C20E2F 100%);
   border-radius: 8px;
   color: white;
   margin-bottom: 1rem;
@@ -67,7 +67,7 @@ body {
   padding: 1rem;
   background: #f8fafc;
   border-radius: 6px;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid #E31837;
 }
 
 .kpi-subsection h4 {
@@ -182,7 +182,7 @@ body {
   content: "→";
   position: absolute;
   left: -1.5rem;
-  color: #3b82f6;
+  color: #E31837;
   font-weight: bold;
 }
 
@@ -201,7 +201,7 @@ body {
 .section-header h3 {
   font-size: 1.25rem;
   color: #34495e;
-  border-bottom: 2px solid #3498db;
+  border-bottom: 2px solid #E31837;
   padding-bottom: 0.5rem;
   flex: 1;
   margin: 0;
@@ -211,7 +211,7 @@ body {
   font-size: 1.25rem;
   margin-bottom: 1rem;
   color: #34495e;
-  border-bottom: 2px solid #3498db;
+  border-bottom: 2px solid #E31837;
   padding-bottom: 0.5rem;
 }
 
@@ -246,8 +246,8 @@ body {
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  border-color: #E31837;
+  box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.1);
 }
 
 .range-inputs {
@@ -270,7 +270,7 @@ body {
   padding: 1rem;
   border-radius: 6px;
   margin-bottom: 1rem;
-  border-left: 3px solid #3498db;
+  border-left: 3px solid #E31837;
 }
 
 .gate-config {
@@ -348,7 +348,7 @@ body {
 }
 
 .run-button {
-  background-color: #3498db;
+  background-color: #E31837;
   color: white;
   border: none;
   padding: 0.75rem 2rem;
@@ -360,7 +360,7 @@ body {
 }
 
 .run-button:hover:not(:disabled) {
-  background-color: #2980b9;
+  background-color: #C20E2F;
 }
 
 .run-button:disabled {
@@ -435,7 +435,7 @@ body {
 }
 
 .error-boundary button {
-  background-color: #3498db;
+  background-color: #E31837;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -445,7 +445,7 @@ body {
 }
 
 .error-boundary button:hover {
-  background-color: #2980b9;
+  background-color: #C20E2F;
 }
 
 .live-dashboard {
@@ -501,10 +501,10 @@ body {
 }
 
 .mode-notice {
-  background: #e7f3ff;
+  background: #fef2f3;
   padding: 0.75rem;
   border-radius: 4px;
-  border-left: 3px solid #2196f3;
+  border-left: 3px solid #E31837;
   margin: 1rem 0;
   font-size: 0.9rem;
 }
@@ -520,7 +520,7 @@ body {
   background: #f8f9fa;
   padding: 1rem;
   border-radius: 4px;
-  border-left: 3px solid #3498db;
+  border-left: 3px solid #E31837;
 }
 
 .stat-label {
@@ -546,7 +546,7 @@ body {
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #3498db, #2ecc71);
+  background: linear-gradient(90deg, #E31837, #C20E2F);
   transition: width 0.3s ease;
 }
 
@@ -579,7 +579,7 @@ body {
 .guide-button {
   margin-top: 1rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #E31837 0%, #C20E2F 100%);
   color: white;
   border: none;
   border-radius: 6px;
@@ -590,12 +590,12 @@ body {
 
 .guide-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(227, 24, 55, 0.4);
 }
 
 .guide-button-small {
   padding: 0.5rem 1rem;
-  background: #3b82f6;
+  background: #E31837;
   color: white;
   border: none;
   border-radius: 6px;
@@ -605,7 +605,7 @@ body {
 }
 
 .guide-button-small:hover {
-  background: #2563eb;
+  background: #C20E2F;
 }
 
 .results-header {
@@ -623,19 +623,19 @@ body {
 .guide-panel {
   margin-top: 1.5rem;
   padding: 1.5rem;
-  background: #f0f9ff;
-  border: 2px solid #3b82f6;
+  background: #fef2f3;
+  border: 2px solid #E31837;
   border-radius: 8px;
   text-align: left;
 }
 
 .guide-panel.active {
   margin-bottom: 1.5rem;
-  background: #eff6ff;
+  background: #fff1f2;
 }
 
 .guide-panel h3 {
-  color: #1e40af;
+  color: #E31837;
   margin-bottom: 1rem;
 }
 
@@ -659,11 +659,11 @@ body {
   padding: 1rem;
   background: white;
   border-radius: 6px;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid #E31837;
 }
 
 .guide-item strong {
-  color: #1e40af;
+  color: #E31837;
   display: block;
   margin-bottom: 0.5rem;
 }
@@ -685,7 +685,7 @@ body {
 }
 
 .capability-section:hover {
-  border-color: #3b82f6;
+  border-color: #E31837;
 }
 
 .capability-section h3 {
@@ -706,8 +706,8 @@ body {
 }
 
 .kpi-row.highlight {
-  background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
-  border: 2px solid #3b82f6;
+  background: linear-gradient(135deg, #fef2f3 0%, #ffe4e6 100%);
+  border: 2px solid #E31837;
   font-weight: 600;
 }
 
@@ -724,7 +724,7 @@ body {
 
 .kpi-value.large {
   font-size: 1.5rem;
-  color: #2563eb;
+  color: #E31837;
 }
 
 .help-text {
@@ -752,8 +752,8 @@ body {
 }
 
 .info-badge {
-  background: #eff6ff;
-  color: #2563eb;
+  background: #fef2f3;
+  color: #E31837;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -836,8 +836,8 @@ body {
 
 .modern-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #E31837;
+  box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.1);
 }
 
 .modern-input:disabled {
@@ -852,7 +852,7 @@ body {
 
 /* Export Card */
 .export-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #E31837 0%, #C20E2F 100%);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -1055,8 +1055,8 @@ body {
 
 .reference-card:hover {
   transform: translateY(-4px);
-  border-color: #3b82f6;
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+  border-color: #E31837;
+  box-shadow: 0 8px 24px rgba(227, 24, 55, 0.2);
 }
 
 .card-icon {
@@ -1065,7 +1065,7 @@ body {
 }
 
 .reference-card h3 {
-  color: #1e40af;
+  color: #E31837;
   font-size: 1.1rem;
   margin-bottom: 1rem;
   font-weight: 600;
@@ -1160,10 +1160,10 @@ body {
 /* Highlight animation for newly added items */
 @keyframes highlightPulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    box-shadow: 0 0 0 0 rgba(227, 24, 55, 0);
   }
   50% {
-    box-shadow: 0 0 20px 5px rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 20px 5px rgba(227, 24, 55, 0.6);
   }
 }
 
