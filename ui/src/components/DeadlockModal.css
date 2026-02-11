@@ -271,8 +271,8 @@
   align-items: center;
   gap: 12px;
   padding: 10px;
-  background-color: #fef3c7;
-  border: 1px solid #fcd34d;
+  background-color: #FFF4EF;
+  border: 1px solid #FFB997;
   border-radius: 6px;
 }
 
@@ -282,7 +282,7 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  background-color: #f59e0b;
+  background-color: #FF6F40;
   color: white;
   border-radius: 50%;
   font-size: 13px;
@@ -292,7 +292,7 @@
 
 .step-text {
   font-size: 14px;
-  color: #78350f;
+  color: #B34A1F;
   font-family: 'Monaco', 'Courier New', monospace;
   font-weight: 500;
 }

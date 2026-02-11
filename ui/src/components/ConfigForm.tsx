@@ -288,10 +288,10 @@ export function ConfigForm({ config, onChange }: ConfigFormProps) {
           padding: '1rem',
           marginBottom: '1rem',
           borderRadius: '6px',
-          border: `2px solid ${validationResult.valid ? '#10b981' : '#ef4444'}`,
+          border: `2px solid ${validationResult.valid ? '#7FCC72' : '#ef4444'}`,
           background: validationResult.valid ? '#ecfdf5' : '#fee'
         }}>
-          <h4 style={{ margin: '0 0 0.5rem 0', color: validationResult.valid ? '#059669' : '#dc2626' }}>
+          <h4 style={{ margin: '0 0 0.5rem 0', color: validationResult.valid ? '#7FCC72' : '#dc2626' }}>
             {validationResult.valid ? '✓ Configuration Valid' : '✗ Configuration Invalid'}
           </h4>
           {validationResult.errors.length > 0 && (
@@ -306,16 +306,16 @@ export function ConfigForm({ config, onChange }: ConfigFormProps) {
           )}
           {validationResult.warnings.length > 0 && (
             <div>
-              <strong style={{ color: '#d97706' }}>Warnings:</strong>
+              <strong style={{ color: '#FF6F40' }}>Warnings:</strong>
               <ul style={{ margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
                 {validationResult.warnings.map((warning, idx) => (
-                  <li key={idx} style={{ color: '#d97706' }}>{warning}</li>
+                  <li key={idx} style={{ color: '#FF6F40' }}>{warning}</li>
                 ))}
               </ul>
             </div>
           )}
           {validationResult.valid && validationResult.warnings.length === 0 && (
-            <p style={{ margin: '0.5rem 0 0 0', color: '#059669' }}>
+            <p style={{ margin: '0.5rem 0 0 0', color: '#7FCC72' }}>
               All validation checks passed. Configuration is ready to run.
             </p>
           )}
