@@ -198,7 +198,7 @@ if (typeof value === 'object') {
                           className="utilization-fill" 
                           style={{ 
                             width: `${util}%`,
-                            backgroundColor: util > 85 ? '#E31837' : util > 60 ? '#FF6F40' : '#7FCC72'
+                            backgroundColor: util > 85 ? '#A41214' : util > 60 ? '#FF6F40' : '#7FCC72'
                           }}
                         />
                       </div>

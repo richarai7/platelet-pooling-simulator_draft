@@ -18,13 +18,13 @@ from simulation_engine import SimulationEngine
 from simulation_engine.repository import ScenarioRepository, ResultsRepository
 from simulation_engine.config_manager import ValidationError
 
-from models import (
+from .models import (
     ScenarioCreateRequest,
     ScenarioResponse,
     SimulationRunRequest,
     SimulationResultsResponse
 )
-from templates import get_platelet_template
+from .templates import get_platelet_template
 
 # Add parent directory for capacity_multiplier
 sys.path.insert(0, str(Path(__file__).parent.parent))

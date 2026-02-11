@@ -11,14 +11,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: linear-gradient(135deg, #E31837 0%, #C20E2F 100%);
+  background: linear-gradient(135deg, #A41214 0%, #8A0302 100%);
   color: white;
   cursor: pointer;
   user-select: none;
 }
 
 .scenario-header:hover {
-  background: linear-gradient(135deg, #C20E2F 0%, #A00C28 100%);
+  background: linear-gradient(135deg, #8A0302 0%, #6E0201 100%);
 }
 
 .scenario-header h3 {
@@ -48,8 +48,8 @@
 }
 
 .scenario-card:hover {
-  border-color: #E31837;
-  box-shadow: 0 2px 8px rgba(227, 24, 55, 0.15);
+  border-color: #A41214;
+  box-shadow: 0 2px 8px rgba(164, 18, 20, 0.15);
 }
 
 .scenario-card:last-child {
@@ -81,8 +81,8 @@
 }
 
 .tag {
-  background: #fef2f3;
-  color: #E31837;
+  background: #fef8f4;
+  color: #A41214;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -118,12 +118,12 @@
 }
 
 .btn-load {
-  color: #E31837;
-  border-color: #E31837 !important;
+  color: #A41214;
+  border-color: #A41214 !important;
 }
 
 .btn-load:hover {
-  background: #E31837;
+  background: #A41214;
   color: white;
 }
 
@@ -149,7 +149,7 @@
 
 .btn-primary {
   background: white;
-  color: #E31837;
+  color: #A41214;
   border: 2px solid white;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -267,8 +267,8 @@
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #E31837;
-  box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.1);
+  border-color: #A41214;
+  box-shadow: 0 0 0 3px rgba(164, 18, 20, 0.1);
 }
 
 .modal-actions {
