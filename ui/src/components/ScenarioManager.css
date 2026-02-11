@@ -128,12 +128,12 @@
 }
 
 .btn-copy {
-  color: #059669;
-  border-color: #059669 !important;
+  color: #7FCC72;
+  border-color: #7FCC72 !important;
 }
 
 .btn-copy:hover {
-  background: #059669;
+  background: #7FCC72;
   color: white;
 }
 
