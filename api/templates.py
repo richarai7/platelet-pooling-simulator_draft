@@ -20,13 +20,13 @@ def get_platelet_template() -> Dict[str, Any]:
             {
                 "id": "centrifuge",
                 "type": "machine",
-                "capacity": 2,
+                "capacity": 10,  # Optimized for multi-batch support (5 batches × 2 flows each)
                 "recovery_time_range": (180, 300)  # 3-5 minutes
             },
             {
                 "id": "platelet_separator",
                 "type": "machine",
-                "capacity": 1,
+                "capacity": 10,  # Optimized for multi-batch support
                 "recovery_time_range": (120, 180)
             },
             
@@ -34,19 +34,19 @@ def get_platelet_template() -> Dict[str, Any]:
             {
                 "id": "pooling_station",
                 "type": "workstation",
-                "capacity": 3,
+                "capacity": 15,  # Optimized for multi-batch support (receives 2 flows per batch)
                 "recovery_time_range": (60, 120)
             },
             {
                 "id": "weigh_register",
                 "type": "machine",
-                "capacity": 2,
+                "capacity": 10,  # Optimized for multi-batch support
                 "recovery_time_range": (30, 60)
             },
             {
                 "id": "sterile_connect",
                 "type": "workstation",
-                "capacity": 2,
+                "capacity": 10,  # Optimized for multi-batch support
                 "recovery_time_range": (45, 90)
             },
             
@@ -54,13 +54,13 @@ def get_platelet_template() -> Dict[str, Any]:
             {
                 "id": "test_sample",
                 "type": "machine",
-                "capacity": 2,
+                "capacity": 10,  # Optimized for multi-batch support
                 "recovery_time_range": (60, 90)
             },
             {
                 "id": "quality_check",
                 "type": "machine",
-                "capacity": 1,
+                "capacity": 10,  # Optimized for multi-batch support
                 "recovery_time_range": (30, 60)
             },
             
@@ -68,7 +68,7 @@ def get_platelet_template() -> Dict[str, Any]:
             {
                 "id": "label_station",
                 "type": "workstation",
-                "capacity": 2,
+                "capacity": 10,  # Optimized for multi-batch support
                 "recovery_time_range": (20, 40)
             },
             {
@@ -82,13 +82,13 @@ def get_platelet_template() -> Dict[str, Any]:
             {
                 "id": "final_inspection",
                 "type": "machine",
-                "capacity": 1,
+                "capacity": 10,  # Optimized for multi-batch support
                 "recovery_time_range": (45, 75)
             },
             {
                 "id": "packaging_station",
                 "type": "workstation",
-                "capacity": 2,
+                "capacity": 10,  # Optimized for multi-batch support
                 "recovery_time_range": (30, 60)
             }
         ],

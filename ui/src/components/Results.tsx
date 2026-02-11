@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SimulationResults } from '../types';
+import { DeadlockModal } from './DeadlockModal';
 
 interface ResultsProps {
   results: SimulationResults | null;
@@ -7,6 +8,23 @@ interface ResultsProps {
 
 export function Results({ results }: ResultsProps) {
   const [showGuide, setShowGuide] = useState(false);
+  const [showDeadlockModal, setShowDeadlockModal] = useState(false);
+
+  // Safe rendering helper to prevent "Objects are not valid as React child" errors
+  const safeRender = (value: any): string => {
+    if (value === null || value === undefined) return 'N/A';
+if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+    return String(value);
+  };
+
+  // Show deadlock modal if deadlock detected
+  React.useEffect(() => {
+    if (results?.status === 'deadlock_detected') {
+      setShowDeadlockModal(true);
+    }
+  }, [results]);
 
   if (!results) {
     return (
@@ -52,6 +70,45 @@ export function Results({ results }: ResultsProps) {
           {showGuide ? '✖ Close Guide' : '📖 Analysis Guide'}
         </button>
       </div>
+
+      {/* Deadlock Status Banner */}
+      {results.status === 'deadlock_detected' && (
+        <div className="status-banner error" style={{
+          padding: '16px',
+          backgroundColor: '#fef2f2',
+          border: '2px solid #dc2626',
+          borderRadius: '8px',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '24px' }}>🚨</span>
+            <div>
+              <strong style={{ color: '#dc2626', fontSize: '16px' }}>Deadlock Detected</strong>
+              <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#991b1b' }}>
+                Simulation terminated due to circular dependency or timeout. Click for details.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowDeadlockModal(true)}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#dc2626',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: '14px'
+            }}
+          >
+            View Details →
+          </button>
+        </div>
+      )}
 
       {showGuide && (
         <div className="guide-panel active">
@@ -99,12 +156,12 @@ export function Results({ results }: ResultsProps) {
           <div className="simulation-info">
             {results.kpis.run_name && (
               <h3 style={{ marginBottom: '0.5rem', color: '#2563eb' }}>
-                Run: {results.kpis.run_name}
+                Run: {safeRender(results.kpis.run_name)}
               </h3>
             )}
             {results.kpis.simulation_name && (
               <h4 style={{ marginTop: 0, color: '#64748b' }}>
-                {results.kpis.simulation_name}
+                {safeRender(results.kpis.simulation_name)}
               </h4>
             )}
           </div>
@@ -120,13 +177,13 @@ export function Results({ results }: ResultsProps) {
             {results.kpis.staff_count !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Total Staff:</span>
-                <span className="kpi-value">{results.kpis.staff_count}</span>
+                <span className="kpi-value">{safeRender(results.kpis.staff_count)}</span>
               </div>
             )}
             {results.kpis.staff_utilization !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Staff Utilization:</span>
-                <span className="kpi-value">{results.kpis.staff_utilization}%</span>
+                <span className="kpi-value">{safeRender(results.kpis.staff_utilization)}%</span>
               </div>
             )}
             {results.kpis.capacity_utilization_per_device && (
@@ -179,7 +236,7 @@ export function Results({ results }: ResultsProps) {
               <div className="kpi-subsection bottleneck-highlight">
                 <h4>⚠️ Bottleneck Identified</h4>
                 <p className="bottleneck-text">
-                  <strong>{results.kpis.resource_bottleneck}</strong> is constraining your throughput.
+                  <strong>{safeRender(results.kpis.resource_bottleneck)}</strong> is constraining your throughput.
                 </p>
                 <p className="help-text">
                   💡 Focus optimization efforts here for maximum impact.
@@ -191,7 +248,7 @@ export function Results({ results }: ResultsProps) {
             {results.kpis.idle_time_percentage !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Average Idle Time:</span>
-                <span className="kpi-value">{results.kpis.idle_time_percentage}%</span>
+                <span className="kpi-value">{safeRender(results.kpis.idle_time_percentage)}%</span>
               </div>
             )}
           </section>
@@ -202,19 +259,27 @@ export function Results({ results }: ResultsProps) {
             {results.kpis.supply_variation !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Supply Variation:</span>
-                <span className="kpi-value">{results.kpis.supply_variation}</span>
+                <span className="kpi-value">
+                  {typeof results.kpis.supply_variation === 'object' 
+                    ? JSON.stringify(results.kpis.supply_variation) 
+                    : results.kpis.supply_variation}
+                </span>
               </div>
             )}
             {results.kpis.input_supply_rate !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Input Supply Rate:</span>
-                <span className="kpi-value">{results.kpis.input_supply_rate}</span>
+                <span className="kpi-value">
+                  {typeof results.kpis.input_supply_rate === 'object' 
+                    ? JSON.stringify(results.kpis.input_supply_rate) 
+                    : results.kpis.input_supply_rate}
+                </span>
               </div>
             )}
             {results.metadata?.random_seed !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Random Seed Used:</span>
-                <span className="kpi-value">{results.metadata.random_seed}</span>
+                <span className="kpi-value">{safeRender(results.metadata.random_seed)}</span>
                 <span className="help-text">Run with different seeds to test variability</span>
               </div>
             )}
@@ -226,13 +291,13 @@ export function Results({ results }: ResultsProps) {
             {results.kpis.average_cycle_time !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Average Cycle Time:</span>
-                <span className="kpi-value">{results.kpis.average_cycle_time}s</span>
+                <span className="kpi-value">{safeRender(results.kpis.average_cycle_time)}s</span>
               </div>
             )}
             {results.kpis.time_to_first_unit !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Time to First Unit:</span>
-                <span className="kpi-value">{results.kpis.time_to_first_unit}s</span>
+                <span className="kpi-value">{safeRender(results.kpis.time_to_first_unit)}s</span>
               </div>
             )}
             <p className="help-text">
@@ -246,25 +311,29 @@ export function Results({ results }: ResultsProps) {
             {results.kpis.total_units_created !== undefined && (
               <div className="kpi-row highlight">
                 <span className="kpi-label">Total Units Created:</span>
-                <span className="kpi-value large">{results.kpis.total_units_created}</span>
+                <span className="kpi-value large">{safeRender(results.kpis.total_units_created)}</span>
               </div>
             )}
             {results.kpis.product_release_volume !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Product Release Volume:</span>
-                <span className="kpi-value">{results.kpis.product_release_volume}</span>
+                <span className="kpi-value">
+                  {typeof results.kpis.product_release_volume === 'object' 
+                    ? JSON.stringify(results.kpis.product_release_volume) 
+                    : results.kpis.product_release_volume}
+                </span>
               </div>
             )}
             {results.kpis.current_throughput !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Current Throughput:</span>
-                <span className="kpi-value">{results.kpis.current_throughput} units/hour</span>
+                <span className="kpi-value">{safeRender(results.kpis.current_throughput)} units/hour</span>
               </div>
             )}
             {results.kpis.peak_throughput !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Peak Throughput:</span>
-                <span className="kpi-value">{results.kpis.peak_throughput} units/hour</span>
+                <span className="kpi-value">{safeRender(results.kpis.peak_throughput)} units/hour</span>
               </div>
             )}
           </section>
@@ -275,19 +344,19 @@ export function Results({ results }: ResultsProps) {
             {results.kpis.constraint_violations !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Constraint Violations:</span>
-                <span className="kpi-value">{results.kpis.constraint_violations}</span>
+                <span className="kpi-value">{safeRender(results.kpis.constraint_violations)}</span>
               </div>
             )}
             {results.kpis.max_queue_length !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Max Queue Length:</span>
-                <span className="kpi-value">{results.kpis.max_queue_length}</span>
+                <span className="kpi-value">{safeRender(results.kpis.max_queue_length)}</span>
               </div>
             )}
             {results.kpis.units_in_queue !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Current Units in Queue:</span>
-                <span className="kpi-value">{results.kpis.units_in_queue}</span>
+                <span className="kpi-value">{safeRender(results.kpis.units_in_queue)}</span>
               </div>
             )}
             <p className="help-text">
@@ -301,10 +370,15 @@ export function Results({ results }: ResultsProps) {
             {results.kpis.demand_forecast !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Demand Forecast:</span>
-                <span className="kpi-value">{results.kpis.demand_forecast}</span>
+                <span className="kpi-value">
+                  {typeof results.kpis.demand_forecast === 'object' 
+                    ? JSON.stringify(results.kpis.demand_forecast) 
+                    : results.kpis.demand_forecast}
+                </span>
               </div>
             )}
-            {results.kpis.optimization_suggestions && results.kpis.optimization_suggestions.length > 0 && (
+            {/* Only show optimization suggestions for successful simulations, not deadlocks */}
+            {results.status !== 'deadlock_detected' && results.kpis.optimization_suggestions && results.kpis.optimization_suggestions.length > 0 && (
               <div className="kpi-subsection">
                 <h4>💡 Optimization Suggestions</h4>
                 <ul className="suggestions-list">
@@ -320,21 +394,49 @@ export function Results({ results }: ResultsProps) {
           <section className="results-section capability-section">
             <h3>📈 8. Productivity & Capacity Forecasting</h3>
             {results.kpis.comparison_to_baseline !== undefined && (
-              <div className="kpi-row">
-                <span className="kpi-label">vs Baseline:</span>
-                <span className="kpi-value">{results.kpis.comparison_to_baseline}</span>
+              <div className="kpi-subsection">
+                <h4>Baseline Comparison</h4>
+                {typeof results.kpis.comparison_to_baseline === 'object' && results.kpis.comparison_to_baseline !== null ? (
+                  <>
+                    {(results.kpis.comparison_to_baseline as any).current !== undefined && (
+                      <div className="kpi-row">
+                        <span className="kpi-label">Current:</span>
+                        <span className="kpi-value">{safeRender((results.kpis.comparison_to_baseline as any).current)}</span>
+                      </div>
+                    )}
+                    {(results.kpis.comparison_to_baseline as any).baseline !== undefined && (
+                      <div className="kpi-row">
+                        <span className="kpi-label">Baseline:</span>
+                        <span className="kpi-value">{safeRender((results.kpis.comparison_to_baseline as any).baseline)}</span>
+                      </div>
+                    )}
+                    {(results.kpis.comparison_to_baseline as any).difference !== undefined && (
+                      <div className="kpi-row">
+                        <span className="kpi-label">Difference:</span>
+                        <span className={`kpi-value ${(results.kpis.comparison_to_baseline as any).difference > 0 ? 'positive' : 'negative'}`}>
+                          {(results.kpis.comparison_to_baseline as any).difference > 0 ? '+' : ''}{safeRender((results.kpis.comparison_to_baseline as any).difference)}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="kpi-row">
+                    <span className="kpi-label">vs Baseline:</span>
+                    <span className="kpi-value">{safeRender(results.kpis.comparison_to_baseline)}</span>
+                  </div>
+                )}
               </div>
             )}
             {results.kpis.cost_per_unit !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Cost per Unit:</span>
-                <span className="kpi-value">${results.kpis.cost_per_unit}</span>
+                <span className="kpi-value">${safeRender(results.kpis.cost_per_unit)}</span>
               </div>
             )}
             {results.kpis.total_operating_cost !== undefined && (
               <div className="kpi-row">
                 <span className="kpi-label">Total Operating Cost:</span>
-                <span className="kpi-value">${results.kpis.total_operating_cost}</span>
+                <span className="kpi-value">${safeRender(results.kpis.total_operating_cost)}</span>
               </div>
             )}
             <div className="capacity-test-helper">
@@ -360,19 +462,19 @@ export function Results({ results }: ResultsProps) {
           {results.kpis.quality_pass_rate !== undefined && (
             <div className="kpi-row">
               <span className="kpi-label">Quality Pass Rate:</span>
-              <span className="kpi-value">{results.kpis.quality_pass_rate}%</span>
+              <span className="kpi-value">{safeRender(results.kpis.quality_pass_rate)}%</span>
             </div>
           )}
           {results.kpis.failed_units_count !== undefined && (
             <div className="kpi-row">
               <span className="kpi-label">Failed Units:</span>
-              <span className="kpi-value">{results.kpis.failed_units_count}</span>
+              <span className="kpi-value">{safeRender(results.kpis.failed_units_count)}</span>
             </div>
           )}
           {results.kpis.waste_rate !== undefined && (
             <div className="kpi-row">
               <span className="kpi-label">Waste Rate:</span>
-              <span className="kpi-value">{results.kpis.waste_rate}%</span>
+              <span className="kpi-value">{safeRender(results.kpis.waste_rate)}%</span>
             </div>
           )}
         </section>
@@ -382,13 +484,13 @@ export function Results({ results }: ResultsProps) {
         <section className="results-section">
           <h3>Metadata</h3>
           <div className="metadata">
-            <p><strong>Duration:</strong> {results.metadata.duration} seconds</p>
-            <p><strong>Random Seed:</strong> {results.metadata.random_seed}</p>
+            <p><strong>Duration:</strong> {safeRender(results.metadata.duration)} seconds</p>
+            <p><strong>Random Seed:</strong> {safeRender(results.metadata.random_seed)}</p>
             {results.metadata.start_time && (
-              <p><strong>Start Time:</strong> {results.metadata.start_time}</p>
+              <p><strong>Start Time:</strong> {safeRender(results.metadata.start_time)}</p>
             )}
             {results.metadata.end_time && (
-              <p><strong>End Time:</strong> {results.metadata.end_time}</p>
+              <p><strong>End Time:</strong> {safeRender(results.metadata.end_time)}</p>
             )}
           </div>
         </section>
@@ -438,6 +540,14 @@ export function Results({ results }: ResultsProps) {
             {JSON.stringify(results, null, 2)}
           </pre>
         </section>
+      )}
+
+      {/* Deadlock Modal (FR22) */}
+      {showDeadlockModal && results.status === 'deadlock_detected' && (
+        <DeadlockModal 
+          results={results} 
+          onClose={() => setShowDeadlockModal(false)} 
+        />
       )}
     </div>
   );

@@ -1,0 +1,987 @@
+{
+  "status": "completed",
+  "metadata": {
+    "simulation_id": "sim_20260210_222851_701318",
+    "duration": 43200,
+    "random_seed": 42,
+    "completed_at": "2026-02-10T22:28:51.702965",
+    "engine_version": "0.1.0"
+  },
+  "summary": {
+    "total_events": 110,
+    "total_flows_completed": 55,
+    "devices_count": 11,
+    "simulation_time_seconds": 3610.836698823638,
+    "execution_time_seconds": 0.0
+  },
+  "device_states": [
+    {
+      "device_id": "centrifuge",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "platelet_separator",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "pooling_station",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "weigh_register",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "sterile_connect",
+      "final_state": "Idle",
+      "state_changes": 4
+    },
+    {
+      "device_id": "test_sample",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "quality_check",
+      "final_state": "Idle",
+      "state_changes": 6
+    },
+    {
+      "device_id": "label_station",
+      "final_state": "Idle",
+      "state_changes": 4
+    },
+    {
+      "device_id": "storage_unit",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "final_inspection",
+      "final_state": "Idle",
+      "state_changes": 2
+    },
+    {
+      "device_id": "packaging_station",
+      "final_state": "Idle",
+      "state_changes": 0
+    }
+  ],
+  "state_history": [
+    {
+      "device_id": "centrifuge",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "centrifuge",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 349.5052773064415
+    },
+    {
+      "device_id": "platelet_separator",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 349.5052773064415
+    },
+    {
+      "device_id": "platelet_separator",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 1015.0966697475225
+    },
+    {
+      "device_id": "pooling_station",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 1015.0966697475225
+    },
+    {
+      "device_id": "pooling_station",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 1482.7369265949037
+    },
+    {
+      "device_id": "weigh_register",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 1482.7369265949037
+    },
+    {
+      "device_id": "weigh_register",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 1819.4352368148407
+    },
+    {
+      "device_id": "sterile_connect",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 1819.4352368148407
+    },
+    {
+      "device_id": "sterile_connect",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2039.8265822283558
+    },
+    {
+      "device_id": "test_sample",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2039.8265822283558
+    },
+    {
+      "device_id": "sterile_connect",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2048.11556484118
+    },
+    {
+      "device_id": "sterile_connect",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2090.719964055355
+    },
+    {
+      "device_id": "test_sample",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2544.72082975641
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2544.72082975641
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2730.965705509197
+    },
+    {
+      "device_id": "label_station",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2730.965705509197
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2766.531629774443
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2796.025520729867
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2810.632077556938
+    },
+    {
+      "device_id": "label_station",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2842.668119527844
+    },
+    {
+      "device_id": "storage_unit",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2842.668119527844
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2955.8138872052546
+    },
+    {
+      "device_id": "label_station",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2955.8138872052546
+    },
+    {
+      "device_id": "label_station",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 3021.873972969838
+    },
+    {
+      "device_id": "storage_unit",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 3051.267765965017
+    },
+    {
+      "device_id": "final_inspection",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 3051.267765965017
+    },
+    {
+      "device_id": "final_inspection",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 3322.535518852675
+    }
+  ],
+  "event_timeline": [
+    {
+      "device_id": "centrifuge",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    },
+    {
+      "device_id": "centrifuge",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 349.5052773064415
+    },
+    {
+      "device_id": "platelet_separator",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 349.5052773064415
+    },
+    {
+      "device_id": "platelet_separator",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 1015.0966697475225
+    },
+    {
+      "device_id": "pooling_station",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 1015.0966697475225
+    },
+    {
+      "device_id": "pooling_station",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 1482.7369265949037
+    },
+    {
+      "device_id": "weigh_register",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 1482.7369265949037
+    },
+    {
+      "device_id": "weigh_register",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 1819.4352368148407
+    },
+    {
+      "device_id": "sterile_connect",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 1819.4352368148407
+    },
+    {
+      "device_id": "sterile_connect",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2039.8265822283558
+    },
+    {
+      "device_id": "test_sample",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2039.8265822283558
+    },
+    {
+      "device_id": "sterile_connect",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2048.11556484118
+    },
+    {
+      "device_id": "sterile_connect",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2090.719964055355
+    },
+    {
+      "device_id": "test_sample",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2544.72082975641
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2544.72082975641
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2730.965705509197
+    },
+    {
+      "device_id": "label_station",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2730.965705509197
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2766.531629774443
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2796.025520729867
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2810.632077556938
+    },
+    {
+      "device_id": "label_station",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2842.668119527844
+    },
+    {
+      "device_id": "storage_unit",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2842.668119527844
+    },
+    {
+      "device_id": "quality_check",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 2955.8138872052546
+    },
+    {
+      "device_id": "label_station",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 2955.8138872052546
+    },
+    {
+      "device_id": "label_station",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 3021.873972969838
+    },
+    {
+      "device_id": "storage_unit",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 3051.267765965017
+    },
+    {
+      "device_id": "final_inspection",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 3051.267765965017
+    },
+    {
+      "device_id": "final_inspection",
+      "from_state": "Processing",
+      "to_state": "Idle",
+      "event": "COMPLETE_PROCESSING",
+      "timestamp": 3322.535518852675
+    }
+  ],
+  "flows_executed": [
+    {
+      "flow_id": "batch_001_flow_01",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_001_flow_02",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_001_flow_03",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_001_flow_04",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_001_flow_05",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_001_flow_06",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_001_flow_07",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_001_flow_08",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_001_flow_09",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_001_flow_10",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_001_flow_11",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_01",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_02",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_03",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_04",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_05",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_06",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_07",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_08",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_09",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_10",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_002_flow_11",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_01",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_02",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_03",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_04",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_05",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_06",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_07",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_08",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_09",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_10",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_003_flow_11",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_01",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_02",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_03",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_04",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_05",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_06",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_07",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_08",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_09",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_10",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_004_flow_11",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_01",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_02",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_03",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_04",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_05",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_06",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_07",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_08",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_09",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_10",
+      "execution_count": 1
+    },
+    {
+      "flow_id": "batch_005_flow_11",
+      "execution_count": 1
+    }
+  ],
+  "kpis": {
+    "total_units_created": 55,
+    "quality_pass_rate": 100.0,
+    "failed_units_count": 0,
+    "average_cycle_time": 0.0,
+    "current_throughput": 54.83493619761474,
+    "uniting_station_utilization": 0.32310147591187127,
+    "testing_lab_utilization": 0.8308323666305262,
+    "capacity_utilization_per_device": {
+      "centrifuge": 0.2769441222101754,
+      "platelet_separator": 0.2769441222101754,
+      "pooling_station": 0.1846294148067836,
+      "weigh_register": 0.2769441222101754,
+      "sterile_connect": 0.5538882444203508,
+      "test_sample": 0.2769441222101754,
+      "quality_check": 0.8308323666305262,
+      "label_station": 0.5538882444203508,
+      "storage_unit": 0.05538882444203508,
+      "final_inspection": 0.2769441222101754,
+      "packaging_station": 0.0
+    },
+    "units_processed": 55,
+    "simulation_time_elapsed": 3610.836698823638,
+    "units_in_queue": 0,
+    "active_units_in_process": 0,
+    "run_name": "sim_20260210_222851",
+    "simulation_name": "Platelet Pooling Simulation",
+    "unit_transfer_tracking": [],
+    "staff_count": 0,
+    "staff_utilization": 0.0,
+    "input_supply_rate": 9.969988399566315,
+    "product_release_volume": 55,
+    "total_operating_cost": 0,
+    "cost_per_unit": 0.0,
+    "waste_rate": 0.0,
+    "waste_cost": 0,
+    "expired_units": 0,
+    "test_results_breakdown": {
+      "passed": 55,
+      "failed": 0,
+      "reasons": {}
+    },
+    "peak_throughput": 54.83493619761474,
+    "avg_wait_time_per_unit": 0.0,
+    "time_to_first_unit": 0.0,
+    "resource_bottleneck": "quality_check",
+    "max_queue_length": 0,
+    "idle_time_percentage": {
+      "centrifuge": 99.72305587778982,
+      "platelet_separator": 99.72305587778982,
+      "pooling_station": 99.81537058519322,
+      "weigh_register": 99.72305587778982,
+      "sterile_connect": 99.44611175557965,
+      "test_sample": 99.72305587778982,
+      "quality_check": 99.16916763336947,
+      "label_station": 99.44611175557965,
+      "storage_unit": 99.94461117555797,
+      "final_inspection": 99.72305587778982,
+      "packaging_station": 100.0
+    },
+    "comparison_to_baseline": {
+      "current": 54.83493619761474,
+      "baseline": 0,
+      "difference": 0
+    },
+    "supply_variation": 0.0,
+    "constraint_violations": 0,
+    "demand_forecast": {
+      "current_rate": 54.83493619761474,
+      "projected_demand": 60.31842981737621,
+      "variance": 5.483493619761474
+    },
+    "optimization_suggestions": [
+      "Increase capacity at quality_check",
+      "Consider reducing centrifuge capacity (only 0.3% utilized)",
+      "Consider reducing platelet_separator capacity (only 0.3% utilized)",
+      "Consider reducing pooling_station capacity (only 0.2% utilized)",
+      "Consider reducing weigh_register capacity (only 0.3% utilized)",
+      "Consider reducing sterile_connect capacity (only 0.6% utilized)",
+      "Consider reducing test_sample capacity (only 0.3% utilized)",
+      "Consider reducing quality_check capacity (only 0.8% utilized)",
+      "Consider reducing label_station capacity (only 0.6% utilized)",
+      "Consider reducing storage_unit capacity (only 0.1% utilized)",
+      "Consider reducing final_inspection capacity (only 0.3% utilized)",
+      "Consider reducing packaging_station capacity (only 0.0% utilized)"
+    ],
+    "processing_station_count": 4,
+    "testing_station_count": 2,
+    "scenario_parameters": {
+      "duration": 43200,
+      "random_seed": 42,
+      "execution_mode": "accelerated",
+      "device_count": 11,
+      "flow_count": 55
+    },
+    "3d_visualization": {
+      "devices": [
+        {
+          "id": "centrifuge",
+          "type": "machine",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "capacity": 10,
+          "utilization": 0.2769441222101754
+        },
+        {
+          "id": "platelet_separator",
+          "type": "machine",
+          "position": [
+            100,
+            0,
+            0
+          ],
+          "capacity": 10,
+          "utilization": 0.2769441222101754
+        },
+        {
+          "id": "pooling_station",
+          "type": "workstation",
+          "position": [
+            200,
+            0,
+            0
+          ],
+          "capacity": 15,
+          "utilization": 0.1846294148067836
+        },
+        {
+          "id": "weigh_register",
+          "type": "machine",
+          "position": [
+            300,
+            0,
+            0
+          ],
+          "capacity": 10,
+          "utilization": 0.2769441222101754
+        },
+        {
+          "id": "sterile_connect",
+          "type": "workstation",
+          "position": [
+            400,
+            0,
+            0
+          ],
+          "capacity": 10,
+          "utilization": 0.5538882444203508
+        },
+        {
+          "id": "test_sample",
+          "type": "machine",
+          "position": [
+            500,
+            0,
+            0
+          ],
+          "capacity": 10,
+          "utilization": 0.2769441222101754
+        },
+        {
+          "id": "quality_check",
+          "type": "machine",
+          "position": [
+            600,
+            0,
+            0
+          ],
+          "capacity": 10,
+          "utilization": 0.8308323666305262
+        },
+        {
+          "id": "label_station",
+          "type": "workstation",
+          "position": [
+            700,
+            0,
+            0
+          ],
+          "capacity": 10,
+          "utilization": 0.5538882444203508
+        },
+        {
+          "id": "storage_unit",
+          "type": "material",
+          "position": [
+            800,
+            0,
+            0
+          ],
+          "capacity": 50,
+          "utilization": 0.05538882444203508
+        },
+        {
+          "id": "final_inspection",
+          "type": "machine",
+          "position": [
+            900,
+            0,
+            0
+          ],
+          "capacity": 10,
+          "utilization": 0.2769441222101754
+        },
+        {
+          "id": "packaging_station",
+          "type": "workstation",
+          "position": [
+            1000,
+            0,
+            0
+          ],
+          "capacity": 10,
+          "utilization": 0.0
+        }
+      ],
+      "flows": [
+        {
+          "from": "centrifuge",
+          "to": "platelet_separator",
+          "id": "batch_001_flow_01"
+        },
+        {
+          "from": "platelet_separator",
+          "to": "pooling_station",
+          "id": "batch_001_flow_02"
+        },
+        {
+          "from": "pooling_station",
+          "to": "weigh_register",
+          "id": "batch_001_flow_03"
+        },
+        {
+          "from": "weigh_register",
+          "to": "sterile_connect",
+          "id": "batch_001_flow_04"
+        },
+        {
+          "from": "sterile_connect",
+          "to": "test_sample",
+          "id": "batch_001_flow_05"
+        },
+        {
+          "from": "test_sample",
+          "to": "quality_check",
+          "id": "batch_001_flow_06"
+        },
+        {
+          "from": "quality_check",
+          "to": "label_station",
+          "id": "batch_001_flow_07"
+        },
+        {
+          "from": "label_station",
+          "to": "storage_unit",
+          "id": "batch_001_flow_08"
+        },
+        {
+          "from": "storage_unit",
+          "to": "final_inspection",
+          "id": "batch_001_flow_09"
+        },
+        {
+          "from": "final_inspection",
+          "to": "packaging_station",
+          "id": "batch_001_flow_10"
+        }
+      ]
+    },
+    "scenario_comparison": {
+      "scenario_id": "sim_20260210_222851",
+      "throughput": 54.83493619761474,
+      "cycle_time": 0.0,
+      "utilization": 0.3239407005246294,
+      "cost_per_unit": 0.0
+    },
+    "device_health": {
+      "centrifuge": "Healthy",
+      "platelet_separator": "Healthy",
+      "pooling_station": "Healthy",
+      "weigh_register": "Healthy",
+      "sterile_connect": "Healthy",
+      "test_sample": "Healthy",
+      "quality_check": "Healthy",
+      "label_station": "Healthy",
+      "storage_unit": "Healthy",
+      "final_inspection": "Healthy",
+      "packaging_station": "Healthy"
+    },
+    "export_timestamp": "2026-02-10T22:28:51.705274",
+    "simulation_id": "sim_20260210_222851"
+  }
+}

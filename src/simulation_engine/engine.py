@@ -9,11 +9,14 @@ from simulation_engine.rng import SeededRNG
 from simulation_engine.event_scheduler import EventScheduler
 from simulation_engine.state_manager import StateManager
 from simulation_engine.flow_controller import FlowController
+from simulation_engine.deadlock_detector import DeadlockDetector, DeadlockInfo
 
 # Constants
 FLOW_RETRY_DELAY_SECONDS = 1.0  # Delay before retrying blocked flows
 GATE_RETRY_DELAY_SECONDS = 1.0  # Delay before rechecking closed gates
 MAX_REAL_TIME_SLEEP_SECONDS = 3600.0  # Maximum sleep duration for real-time mode
+DEADLOCK_CHECK_INTERVAL = 30.0  # Check for deadlocks every 30 seconds
+DEADLOCK_TIMEOUT_THRESHOLD = 300.0  # Declare deadlock if blocked for 5+ minutes
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +54,7 @@ class SimulationEngine:
 
         # Execution mode
         self.execution_mode = self.config["simulation"].get("execution_mode", "accelerated")
-        self.speed_multiplier = self.config["simulation"].get("speed_multiplier", 1.0)  # Speed factor for accelerated modes
+        self.speed_multiplier = self.config["simulation"].get("speed_multiplier", None)  # Speed factor: None/0 = max speed, 1 = real-time, 10 = 10x faster
         self._real_time_start: float = 0.0  # Real-world clock start time
 
         # Tracking
@@ -73,6 +76,11 @@ class SimulationEngine:
         
         # Register auto-recovery callback
         self.state_manager.set_recovery_callback(self._schedule_device_recovery)
+        
+        # Initialize deadlock detector (FR22)
+        deadlock_timeout = self.config["simulation"].get("deadlock_timeout", DEADLOCK_TIMEOUT_THRESHOLD)
+        self.deadlock_detector = DeadlockDetector(timeout_threshold=deadlock_timeout)
+        self._last_deadlock_check = 0.0
 
     def run(self) -> Dict[str, Any]:
         """
@@ -95,7 +103,7 @@ class SimulationEngine:
         start_time = time.time()
         
         # Initialize real-time tracking if needed
-        if self.execution_mode == "real-time" or self.speed_multiplier > 0:
+        if self.execution_mode == "real-time" or (self.speed_multiplier is not None and self.speed_multiplier > 0):
             self._real_time_start = time.time()
 
         # Schedule initial flow events
@@ -117,11 +125,11 @@ class SimulationEngine:
                 break  # Exceeded simulation duration
 
             # Real-time mode or speed multiplier: wait until system clock catches up
-            if next_event and (self.execution_mode == "real-time" or self.speed_multiplier > 0):
+            if next_event and (self.execution_mode == "real-time" or (self.speed_multiplier is not None and self.speed_multiplier > 0)):
                 # Calculate target real time based on speed multiplier
                 if self.execution_mode == "real-time":
                     time_factor = 1.0  # Real-time = 1:1
-                elif self.speed_multiplier > 0:
+                elif self.speed_multiplier is not None and self.speed_multiplier > 0:
                     time_factor = 1.0 / self.speed_multiplier  # 10x = 0.1, 100x = 0.01
                 else:
                     time_factor = 0  # Maximum speed (no waiting)
@@ -143,6 +151,15 @@ class SimulationEngine:
 
             self.scheduler.process_next()
             self._event_count += 1
+            
+            # Periodic deadlock detection (FR22)
+            if self.scheduler.current_time - self._last_deadlock_check >= DEADLOCK_CHECK_INTERVAL:
+                deadlock = self.deadlock_detector.check_deadlock(self.scheduler.current_time)
+                if deadlock:
+                    # Deadlock detected - prepare error information and terminate
+                    execution_time = time.time() - start_time
+                    return self._generate_deadlock_error_output(deadlock, execution_time)
+                self._last_deadlock_check = self.scheduler.current_time
 
         execution_time = time.time() - start_time
 
@@ -156,8 +173,13 @@ class SimulationEngine:
         Universal Offset Modes:
         - parallel: All flows start at T=0 (offset=0)
         - sequence: Flow starts after previous flow completes (calculated dynamically)
-        - custom: Flow starts at T=0 + start_offset
+        - custom: Flow starts at T=0 + start_offset (FR21: supports offset_range)
+        
+        FR21 Enhancements:
+        - offset_range: If specified [min, max], samples random offset instead of fixed start_offset
         """
+        import random
+        
         flow_start_times: Dict[str, float] = {}
         
         for flow in self.config["flows"]:
@@ -177,7 +199,16 @@ class SimulationEngine:
                 
             elif offset_mode == "custom":
                 # Custom: Start at T=0 + specified offset
-                start_offset = flow.get("start_offset", 0.0)
+                # FR21: Support offset_range for random delays
+                offset_range = flow.get("offset_range")
+                if offset_range and len(offset_range) == 2:
+                    # Random offset between min and max
+                    min_offset, max_offset = offset_range
+                    start_offset = random.uniform(min_offset, max_offset)
+                    logger.debug(f"Flow {flow_id}: Sampled random offset {start_offset:.2f}s from range {offset_range}")
+                else:
+                    # Fixed offset
+                    start_offset = flow.get("start_offset", 0.0)
                 start_time = start_offset
                 
             elif offset_mode == "sequence":
@@ -209,7 +240,14 @@ class SimulationEngine:
 
     def _execute_flow(self, flow_id: str) -> None:
         """
-        Execute a single flow with Finish-to-Start prerequisite checking and gate validation.
+        Execute a single flow with advanced dependency and timing control (FR21).
+
+        Features:
+        - Finish-to-Start: Default - wait for dependencies to complete
+        - Start-to-Start (FR21): Allow execution once dependencies have started
+        - Conditional Delays (FR21): Apply dynamic delays based on device state
+        - Gate Validation: Verify global conditions before execution
+        - Backpressure Detection: Block if downstream lacks capacity
 
         Args:
             flow_id: Flow to execute
@@ -242,12 +280,24 @@ class SimulationEngine:
                     )
                     return  # Don't execute while gate is closed
 
-            # FINISH-TO-START: Check if all prerequisite flows are completed
+            # FR21: OFFSET TYPE DEPENDENCY CHECKING
+            # Support both finish-to-start (wait for completion) and start-to-start (wait for start)
             dependencies = flow.get("dependencies") or []
             if dependencies:
-                # Check if all dependencies are completed
+                offset_type = flow.get("offset_type", "finish-to-start")  # Default: finish-to-start
+                
+                # Check dependency readiness based on offset type
                 for dep_flow_id in dependencies:
-                    if not self.flow_controller.is_completed(dep_flow_id):
+                    dependency_ready = False
+                    
+                    if offset_type == "start-to-start":
+                        # Start-to-start: Can proceed once dependency has started
+                        dependency_ready = self.flow_controller.is_started(dep_flow_id)
+                    else:
+                        # Finish-to-start (default): Wait for dependency to complete
+                        dependency_ready = self.flow_controller.is_completed(dep_flow_id)
+                    
+                    if not dependency_ready:
                         # Prerequisites not met - reschedule this flow to check later
                         def make_retry_callback(fid: str) -> Callable[[], None]:
                             return lambda: self._execute_flow(fid)
@@ -257,10 +307,66 @@ class SimulationEngine:
                             event_id=f"flow_retry_{flow_id}_{self.scheduler.current_time}",
                             callback=make_retry_callback(flow_id),
                         )
+                        logger.debug(f"Flow {flow_id} waiting for {offset_type} dependency {dep_flow_id}")
                         return  # Don't execute yet
+
+            # FR21: CONDITIONAL DELAYS - Apply dynamic delays based on device state
+            conditional_delays = flow.get("conditional_delays") or []
+            total_conditional_delay = 0.0
+            
+            from_device = flow["from_device"]
+            to_device = flow["to_device"]
+            
+            for condition in conditional_delays:
+                condition_met = False
+                delay_seconds = condition.get("delay_seconds", 0.0)
+                
+                # Evaluate condition based on type
+                if condition.get("condition_type") == "high_utilization":
+                    # Check if device utilization exceeds threshold
+                    device_id = condition.get("device_id", from_device)
+                    threshold = condition.get("threshold", 0.8)
+                    
+                    # Get device utilization from state manager
+                    # Utilization = active_flows / capacity
+                    current_count = self.state_manager.get_active_flow_count(device_id)
+                    
+                    # Get capacity from device config
+                    device_config = next(
+                        (d for d in self.config["devices"] if d["id"] == device_id), 
+                        None
+                    )
+                    max_capacity = device_config.get("capacity", 1) if device_config else 1
+                    utilization = current_count / max_capacity if max_capacity > 0 else 0.0
+                    
+                    if utilization >= threshold:
+                        condition_met = True
+                        logger.debug(
+                            f"Flow {flow_id}: High utilization condition met for {device_id} "
+                            f"({utilization:.1%} >= {threshold:.1%}), adding {delay_seconds}s delay"
+                        )
+                
+                if condition_met:
+                    total_conditional_delay += delay_seconds
+            
+            # If conditional delays apply, reschedule with delay
+            if total_conditional_delay > 0:
+                def make_delay_callback(fid: str) -> Callable[[], None]:
+                    return lambda: self._execute_flow(fid)
+                
+                self.scheduler.schedule(
+                    timestamp=self.scheduler.current_time + total_conditional_delay,
+                    event_id=f"flow_conditional_delay_{flow_id}_{self.scheduler.current_time}",
+                    callback=make_delay_callback(flow_id),
+                )
+                logger.info(f"Flow {flow_id}: Applied {total_conditional_delay}s conditional delay")
+                return  # Reschedule with delay
 
             # Track execution
             self._flow_executions[flow_id] = self._flow_executions.get(flow_id, 0) + 1
+            
+            # FR21: Mark flow as started for start-to-start tracking
+            self.flow_controller.mark_started(flow_id)
 
             # BACKPRESSURE: Check if downstream device has capacity
             to_device = flow["to_device"]
@@ -275,6 +381,13 @@ class SimulationEngine:
                     pass
                 elif current_state.value == "Processing":
                     self.state_manager.transition(from_device, "BACKPRESSURE_DETECTED")
+                
+                # Register blocked state with deadlock detector
+                self.deadlock_detector.register_blocked(
+                    from_device, 
+                    self.scheduler.current_time, 
+                    waiting_for_device=to_device
+                )
                 
                 # Reschedule flow to check capacity later
                 def make_backpressure_retry_callback(fid: str) -> Callable[[], None]:
@@ -300,6 +413,12 @@ class SimulationEngine:
                     callback=make_capacity_retry_callback(flow_id),
                 )
                 logger.debug(f"Flow {flow_id} blocked - source {from_device} at capacity")
+                
+                # Register blocked state
+                self.deadlock_detector.register_blocked(
+                    from_device,
+                    self.scheduler.current_time
+                )
                 return
             
             # Also acquire capacity on destination device (backpressure prevention)
@@ -317,12 +436,21 @@ class SimulationEngine:
                     callback=make_dest_capacity_retry_callback(flow_id),
                 )
                 logger.debug(f"Flow {flow_id} blocked - destination {to_device} at capacity")
+                
+                # Register blocked state
+                self.deadlock_detector.register_blocked(
+                    from_device,
+                    self.scheduler.current_time,
+                    waiting_for_device=to_device
+                )
                 return
             
             # Clear BLOCKED state if was blocked
             current_state = self.state_manager.get_state(from_device)
             if current_state.value == "Blocked":
                 self.state_manager.transition(from_device, "BACKPRESSURE_CLEARED")
+                # Register unblocked with deadlock detector
+                self.deadlock_detector.register_unblocked(from_device)
 
             # Transition source device to Processing
             current_state = self.state_manager.get_state(from_device)
@@ -417,6 +545,66 @@ class SimulationEngine:
                         callback=make_callback(flow_id),
                     )
 
+    def _generate_deadlock_error_output(self, deadlock: DeadlockInfo, execution_time: float) -> Dict[str, Any]:
+        """
+        Generate error output when deadlock is detected.
+        
+        Args:
+            deadlock: Deadlock information
+            execution_time: Wall clock execution time in seconds
+            
+        Returns:
+            Error output dictionary with deadlock details
+        """
+        logger.error(f"Simulation terminated due to deadlock: {deadlock.message}")
+        
+        output = {
+            "status": "deadlock_detected",  # Top-level status for easy checking
+            "execution_time": round(execution_time, 2),  # Top-level for test compatibility
+            "metadata": {
+                "simulation_id": f"sim_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                "duration": self.config["simulation"]["duration"],
+                "random_seed": self.config["simulation"]["random_seed"],
+                "completed_at": datetime.now().isoformat(),
+                "engine_version": "0.1.0",
+            },
+            "summary": {
+                "total_events": self._event_count,
+                "total_flows_completed": sum(self._flow_executions.values()),
+                "devices_count": len(self.config["devices"]),
+                "simulation_time_seconds": self.scheduler.current_time,
+                "execution_time_seconds": round(execution_time, 2),
+            },
+            "device_states": self._get_final_device_states(),
+            "error": {
+                "type": "DeadlockError",
+                "message": deadlock.message,
+                "deadlock_info": {
+                    "deadlock_type": deadlock.type.value,
+                    "involved_devices": deadlock.involved_devices,
+                    "involved_flows": deadlock.involved_flows,
+                    "detection_time": deadlock.detection_time,
+                    "wait_chain": deadlock.wait_chain,
+                    "wait_graph": self.deadlock_detector.get_wait_graph(),
+                    "timeout_devices": [
+                        {"device_id": dev_id, "blocked_since": blocked_since}
+                        for dev_id, blocked_since in self.deadlock_detector.get_blocked_devices()
+                    ] if deadlock.type.value == "timeout" else None,
+                    "blocked_devices": [
+                        {"device_id": dev_id, "blocked_since": blocked_since}
+                        for dev_id, blocked_since in self.deadlock_detector.get_blocked_devices()
+                    ]
+                }
+            },
+            "kpis": {}  # Empty KPIs for deadlocked simulation
+        }
+        
+        # Add state history if requested
+        if self.config["output_options"].get("include_history"):
+            output["state_history"] = self.state_manager.get_history()
+        
+        return output
+
     def _generate_output(self, execution_time: float) -> Dict[str, Any]:
         """
         Generate structured output dictionary.
@@ -428,6 +616,7 @@ class SimulationEngine:
             Complete simulation results
         """
         output = {
+            "status": "completed",  # Successful completion (vs "deadlock_detected")
             "metadata": {
                 "simulation_id": f"sim_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
                 "duration": self.config["simulation"]["duration"],

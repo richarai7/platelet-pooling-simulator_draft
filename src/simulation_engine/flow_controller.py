@@ -25,6 +25,7 @@ class FlowController:
         self._flows = {f["flow_id"]: f for f in flows}
         self._devices = set(devices)
         self._completed: Set[str] = set()
+        self._started: Set[str] = set()  # FR21: Track flow start times for start-to-start offsets
 
         self._validate()
 
@@ -121,3 +122,31 @@ class FlowController:
     def is_completed(self, flow_id: str) -> bool:
         """Check if flow is completed."""
         return flow_id in self._completed
+
+    def mark_started(self, flow_id: str) -> None:
+        """
+        Mark flow as started (FR21).
+        
+        Used for start-to-start offset dependency tracking.
+        A flow is considered started when it begins processing,
+        not when it completes.
+        
+        Args:
+            flow_id: Flow identifier
+        """
+        self._started.add(flow_id)
+    
+    def is_started(self, flow_id: str) -> bool:
+        """
+        Check if flow has started (FR21).
+        
+        Used for start-to-start offset validation where dependent
+        flows can begin once predecessors have started, not completed.
+        
+        Args:
+            flow_id: Flow identifier
+            
+        Returns:
+            True if flow has started processing
+        """
+        return flow_id in self._started

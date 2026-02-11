@@ -50,14 +50,14 @@ class ScenarioRepository:
     ) -> int:
         """Save scenario configuration to database."""
         config_json = json.dumps(config, indent=2, sort_keys=True)
-        tags_str = ",".join(tags) if tags else ""
+        tags_json = json.dumps(tags) if tags else "[]"
 
         conn = None
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.execute(
                 "INSERT INTO scenarios (name, description, config_json, tags) VALUES (?, ?, ?, ?)",
-                (name, description, config_json, tags_str),
+                (name, description, config_json, tags_json),
             )
             conn.commit()
             return cursor.lastrowid

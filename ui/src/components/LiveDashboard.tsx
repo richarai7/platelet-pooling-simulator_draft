@@ -91,10 +91,10 @@ export function LiveDashboard({
       
       {/* Run Metadata Section */}
       <div className="metadata-section">
-        <h3>Run Metadata</h3>
-        <div className="metadata-inputs">
-          <div className="input-group">
-            <label htmlFor="simulation-name">Simulation Name:</label>
+        <h3>📝 Run Metadata</h3>
+        <div className="metadata-grid">
+          <div className="input-field">
+            <label htmlFor="simulation-name">Simulation Name</label>
             <input
               id="simulation-name"
               type="text"
@@ -102,10 +102,11 @@ export function LiveDashboard({
               onChange={(e) => setSimulationName(e.target.value)}
               placeholder="e.g., Platelet Processing"
               disabled={isRunning}
+              className="modern-input"
             />
           </div>
-          <div className="input-group">
-            <label htmlFor="run-name">Run Name:</label>
+          <div className="input-field">
+            <label htmlFor="run-name">Run Name</label>
             <input
               id="run-name"
               type="text"
@@ -113,37 +114,46 @@ export function LiveDashboard({
               onChange={(e) => setRunName(e.target.value)}
               placeholder="e.g., Baseline Test"
               disabled={isRunning}
+              className="modern-input"
             />
           </div>
         </div>
         
         {/* Export Options */}
-        <div className="export-options">
-          <h4>Export Options</h4>
-          <div className="input-group checkbox-group">
-            <label>
+        <div className="export-card">
+          <div className="export-header">
+            <span className="export-icon">💾</span>
+            <h4>Export Options</h4>
+          </div>
+          <div className="export-body">
+            <label className="checkbox-label">
               <input
                 type="checkbox"
                 checked={exportToJson}
                 onChange={(e) => setExportToJson(e.target.checked)}
                 disabled={isRunning}
+                className="modern-checkbox"
               />
-              Export results to JSON file
+              <span className="checkbox-text">
+                <strong>Export results to JSON file</strong>
+                <small>Save simulation results for later analysis</small>
+              </span>
             </label>
+            {exportToJson && (
+              <div className="input-field export-dir-field">
+                <label htmlFor="export-dir">Export Directory</label>
+                <input
+                  id="export-dir"
+                  type="text"
+                  value={exportDirectory}
+                  onChange={(e) => setExportDirectory(e.target.value)}
+                  placeholder="simulation_results"
+                  disabled={isRunning}
+                  className="modern-input"
+                />
+              </div>
+            )}
           </div>
-          {exportToJson && (
-            <div className="input-group">
-              <label htmlFor="export-dir">Export Directory:</label>
-              <input
-                id="export-dir"
-                type="text"
-                value={exportDirectory}
-                onChange={(e) => setExportDirectory(e.target.value)}
-                placeholder="simulation_results"
-                disabled={isRunning}
-              />
-            </div>
-          )}
         </div>
       </div>
       

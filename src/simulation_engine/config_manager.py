@@ -29,6 +29,10 @@ class FlowConfig(TypedDict, total=False):
     # Universal Offset fields
     offset_mode: Optional[Literal["parallel", "sequence", "custom"]]  # Default: parallel
     start_offset: Optional[float]  # Seconds delay before flow starts (custom mode only)
+    # FR21: Advanced offset patterns
+    offset_type: Optional[Literal["finish-to-start", "start-to-start"]]  # Default: finish-to-start
+    offset_range: Optional[tuple]  # Random offset range [min, max] in seconds
+    conditional_delays: Optional[List[Dict]]  # State-based delay modifiers
     # Flow type for load/unload operations
     flow_type: Optional[Literal["process", "load", "unload"]]  # Default: process
     # Custom metadata (key-value pairs)
@@ -158,8 +162,8 @@ class ConfigManager:
                 min_time, max_time = time_range
                 if min_time < 0:
                     errors.append(f"Flow {flow.get('flow_id')} has negative min time")
-                if max_time <= min_time:
-                    errors.append(f"Flow {flow.get('flow_id')} time range must have min < max")
+                if max_time < min_time:
+                    errors.append(f"Flow {flow.get('flow_id')} time range must have min <= max")
 
         for device in self._config.get("devices", []):
             time_range = device.get("recovery_time_range")

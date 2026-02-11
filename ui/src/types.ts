@@ -7,6 +7,9 @@ export interface Device {
   initial_state: DeviceState;
   recovery_time_range: [number, number] | null;
   required_gates?: string[] | null;  // Gates that must be active
+  // Financial parameters (FR1)
+  operational_cost_per_hour?: number;
+  cost_per_action?: number;
 }
 
 export interface Flow {
@@ -17,6 +20,20 @@ export interface Flow {
   priority: number;
   dependencies: string[] | null;
   required_gates?: string[] | null;  // Gates that must be active
+  
+  // Universal Offset System
+  offset_mode?: "parallel" | "sequence" | "custom";
+  start_offset?: number;
+  
+  // FR21: Advanced Offset Patterns
+  offset_type?: "finish-to-start" | "start-to-start";  // Default: finish-to-start
+  offset_range?: [number, number];  // Random delay range [min, max]
+  conditional_delays?: Array<{
+    condition_type: "high_utilization";
+    device_id?: string;
+    threshold?: number;
+    delay_seconds: number;
+  }>;
 }
 
 export interface SimulationConfig {
@@ -24,6 +41,7 @@ export interface SimulationConfig {
     duration: number;
     random_seed: number;
     execution_mode?: "accelerated" | "real-time";
+    speed_multiplier?: number;
   };
   devices: Device[];
   flows: Flow[];
@@ -45,6 +63,24 @@ export interface Scenario {
 }
 
 export interface SimulationResults {
+  // FR22: Deadlock detection fields
+  status?: 'completed' | 'deadlock_detected';
+  execution_time?: number;
+  error?: {
+    type: string;
+    message: string;
+    deadlock_info: {
+      deadlock_type: 'timeout' | 'circular_wait';
+      involved_devices: string[];
+      involved_flows: string[];
+      detection_time: number;
+      wait_chain: string[];
+      wait_graph: Record<string, string[]>;
+      timeout_devices?: Array<{ device_id: string; blocked_since: number }>;
+      blocked_devices: Array<{ device_id: string; blocked_since: number }>;
+    };
+  };
+  
   metadata?: {
     duration: number;
     random_seed: number;
@@ -57,6 +93,10 @@ export interface SimulationResults {
   };
   summary?: {
     total_events?: number;
+    total_flows_completed?: number;
+    devices_count?: number;
+    simulation_time_seconds?: number;
+    execution_time_seconds?: number;
     devices?: Record<string, any>;
   };
   device_states?: Record<string, any>;

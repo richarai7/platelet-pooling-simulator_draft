@@ -1,0 +1,111 @@
+{
+  "status": "deadlock_detected",
+  "execution_time": 0.03,
+  "metadata": {
+    "simulation_id": "sim_20260210_220449_857164",
+    "duration": 43200,
+    "random_seed": 42,
+    "completed_at": "2026-02-10T22:04:49.886574",
+    "engine_version": "0.1.0"
+  },
+  "summary": {
+    "total_events": 1985,
+    "total_flows_completed": 1985,
+    "devices_count": 11,
+    "simulation_time_seconds": 330.0,
+    "execution_time_seconds": 0.03
+  },
+  "device_states": [
+    {
+      "device_id": "centrifuge",
+      "final_state": "Processing",
+      "state_changes": 1
+    },
+    {
+      "device_id": "platelet_separator",
+      "final_state": "Idle",
+      "state_changes": 0
+    },
+    {
+      "device_id": "pooling_station",
+      "final_state": "Idle",
+      "state_changes": 0
+    },
+    {
+      "device_id": "weigh_register",
+      "final_state": "Idle",
+      "state_changes": 0
+    },
+    {
+      "device_id": "sterile_connect",
+      "final_state": "Idle",
+      "state_changes": 0
+    },
+    {
+      "device_id": "test_sample",
+      "final_state": "Idle",
+      "state_changes": 0
+    },
+    {
+      "device_id": "quality_check",
+      "final_state": "Idle",
+      "state_changes": 0
+    },
+    {
+      "device_id": "label_station",
+      "final_state": "Idle",
+      "state_changes": 0
+    },
+    {
+      "device_id": "storage_unit",
+      "final_state": "Idle",
+      "state_changes": 0
+    },
+    {
+      "device_id": "final_inspection",
+      "final_state": "Idle",
+      "state_changes": 0
+    },
+    {
+      "device_id": "packaging_station",
+      "final_state": "Idle",
+      "state_changes": 0
+    }
+  ],
+  "error": {
+    "type": "DeadlockError",
+    "message": "Timeout deadlock: Device 'centrifuge' has been BLOCKED for 330.0s (threshold: 300.0s). No downstream capacity available.",
+    "deadlock_info": {
+      "deadlock_type": "timeout",
+      "involved_devices": [
+        "centrifuge"
+      ],
+      "involved_flows": [],
+      "detection_time": 330.0,
+      "wait_chain": null,
+      "wait_graph": {},
+      "timeout_devices": [
+        {
+          "device_id": "centrifuge",
+          "blocked_since": 0.0
+        }
+      ],
+      "blocked_devices": [
+        {
+          "device_id": "centrifuge",
+          "blocked_since": 0.0
+        }
+      ]
+    }
+  },
+  "kpis": {},
+  "state_history": [
+    {
+      "device_id": "centrifuge",
+      "from_state": "Idle",
+      "to_state": "Processing",
+      "event": "START_PROCESSING",
+      "timestamp": 0.0
+    }
+  ]
+}

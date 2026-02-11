@@ -1,8 +1,13 @@
 import { SimulationConfig, SimulationResults, Scenario } from './types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// In dev mode, use empty string to use Vite's proxy
+// In production, use the configured URL or default
+const API_BASE_URL = import.meta.env.DEV ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
+
+console.log('API Base URL:', API_BASE_URL);
 
 async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
+  console.log('Fetching:', url);
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -12,9 +17,18 @@ async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
     },
   });
 
+  console.log('Response status:', response.status);
+  
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: response.statusText }));
-    throw new Error(error.detail || `HTTP ${response.status}: ${response.statusText}`);
+    let errorDetail = response.statusText;
+    try {
+      const error = await response.json();
+      console.error('API Error Response:', error);
+      errorDetail = error.detail || response.statusText;
+    } catch (e) {
+      console.error('Failed to parse error response:', e);
+    }
+    throw new Error(errorDetail || `HTTP ${response.status}: ${response.statusText}`);
   }
 
   // Handle 204 No Content
@@ -22,7 +36,9 @@ async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
     return undefined as T;
   }
 
-  return response.json();
+  const data = await response.json();
+  console.log('Response data keys:', Object.keys(data));
+  return data;
 }
 
 export async function getTemplate(): Promise<SimulationConfig> {
@@ -36,6 +52,15 @@ export async function runSimulation(
   exportToJson: boolean = true,
   exportDirectory?: string
 ): Promise<{ results: SimulationResults; simulationId?: string }> {
+  console.log('API: Sending simulation request with:', {
+    hasDevices: !!config.devices,
+    deviceCount: config.devices?.length,
+    devicesType: Array.isArray(config.devices) ? 'array' : typeof config.devices,
+    hasFlows: !!config.flows,
+    hasSimulation: !!config.simulation,
+    hasOutputOptions: !!config.output_options
+  });
+  
   const response = await fetchJSON<{ 
     results: SimulationResults; 
     json_export_path?: string;
@@ -53,6 +78,11 @@ export async function runSimulation(
       }),
     }
   );
+  
+  console.log('API: Received response:', {
+    hasResults: !!response.results,
+    resultsKeys: response.results ? Object.keys(response.results) : []
+  });
   
   // Add json export path to results if available
   if (response.json_export_path) {
