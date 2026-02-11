@@ -192,8 +192,8 @@
 .badge {
   display: inline-block;
   padding: 4px 10px;
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: #fef2f3;
+  color: #E31837;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
@@ -235,7 +235,7 @@
 
 .device-node {
   padding: 6px 12px;
-  background-color: #3b82f6;
+  background-color: #E31837;
   color: white;
   border-radius: 4px;
   font-size: 13px;
@@ -385,8 +385,8 @@
 
 /* Suggestions */
 .suggestions-section {
-  background-color: #eff6ff;
-  border: 1px solid #bfdbfe;
+  background-color: #fef2f3;
+  border: 1px solid #fecaca;
   border-radius: 8px;
   padding: 20px;
 }
@@ -394,7 +394,7 @@
 .suggestions-section h3 {
   margin: 0 0 12px 0;
   font-size: 16px;
-  color: #1e40af;
+  color: #E31837;
   font-weight: 600;
 }
 
@@ -406,7 +406,7 @@
 .suggestions-section li {
   margin-bottom: 8px;
   font-size: 14px;
-  color: #1e3a8a;
+  color: #C20E2F;
   line-height: 1.6;
 }
 
@@ -446,12 +446,12 @@
 }
 
 .btn-primary {
-  background-color: #3b82f6;
+  background-color: #E31837;
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #2563eb;
+  background-color: #C20E2F;
 }
 
 /* Responsive */
