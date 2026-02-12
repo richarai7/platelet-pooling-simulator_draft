@@ -9,7 +9,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -29,42 +29,36 @@ logger = logging.getLogger(__name__)
 # Sample simulation configuration
 SAMPLE_CONFIG = {
     "simulation": {
-        "duration": 10000,  # 10,000 seconds (~2.7 hours)
+        "duration": 3600,  # 1 hour
         "random_seed": 42,
         "execution_mode": "accelerated"
     },
     "output_options": {
         "include_history": True,
-        "include_flow_details": True
+        "include_flow_details": True,
+        "include_events": True
     },
     "devices": [
         {
             "id": "centrifuge-01",
             "type": "centrifuge",
-            "capacity": 2,
+            "capacity": 3,  # Increased capacity
             "initial_state": "Idle",
-            "recovery_time_range": (300, 600)
+            "recovery_time_range": (10, 20)  # Shorter recovery time
         },
         {
             "id": "separator-01",
             "type": "separator",
-            "capacity": 2,
+            "capacity": 3,  # Increased capacity
             "initial_state": "Idle",
-            "recovery_time_range": (300, 600)
+            "recovery_time_range": (10, 20)
         },
         {
-            "id": "macopress-01",
-            "type": "macopress",
-            "capacity": 1,
+            "id": "storage-01",
+            "type": "storage",
+            "capacity": 50,  # Large capacity
             "initial_state": "Idle",
-            "recovery_time_range": (180, 300)
-        },
-        {
-            "id": "quality-check-01",
-            "type": "quality_station",
-            "capacity": 1,
-            "initial_state": "Idle",
-            "recovery_time_range": (120, 240)
+            "recovery_time_range": None  # No recovery needed
         }
     ],
     "flows": [
@@ -72,50 +66,51 @@ SAMPLE_CONFIG = {
             "flow_id": "batch_001_flow_01",
             "from_device": "centrifuge-01",
             "to_device": "separator-01",
-            "process_time_range": (600, 900),
+            "process_time_range": (100, 200),
             "priority": 1,
             "dependencies": None
         },
         {
             "flow_id": "batch_001_flow_02",
             "from_device": "separator-01",
-            "to_device": "macopress-01",
-            "process_time_range": (900, 1200),
+            "to_device": "storage-01",
+            "process_time_range": (100, 200),
             "priority": 1,
             "dependencies": ["batch_001_flow_01"]
-        },
-        {
-            "flow_id": "batch_001_flow_03",
-            "from_device": "macopress-01",
-            "to_device": "quality-check-01",
-            "process_time_range": (300, 600),
-            "priority": 1,
-            "dependencies": ["batch_001_flow_02"]
         },
         # Batch 2
         {
             "flow_id": "batch_002_flow_01",
             "from_device": "centrifuge-01",
             "to_device": "separator-01",
-            "process_time_range": (600, 900),
+            "process_time_range": (100, 200),
             "priority": 1,
             "dependencies": None
         },
         {
             "flow_id": "batch_002_flow_02",
             "from_device": "separator-01",
-            "to_device": "macopress-01",
-            "process_time_range": (900, 1200),
+            "to_device": "storage-01",
+            "process_time_range": (100, 200),
             "priority": 1,
             "dependencies": ["batch_002_flow_01"]
         },
+        # Batch 3
         {
-            "flow_id": "batch_002_flow_03",
-            "from_device": "macopress-01",
-            "to_device": "quality-check-01",
-            "process_time_range": (300, 600),
+            "flow_id": "batch_003_flow_01",
+            "from_device": "centrifuge-01",
+            "to_device": "separator-01",
+            "process_time_range": (100, 200),
             "priority": 1,
-            "dependencies": ["batch_002_flow_02"]
+            "dependencies": None
+        },
+        {
+            "flow_id": "batch_003_flow_02",
+            "from_device": "separator-01",
+            "to_device": "storage-01",
+            "process_time_range": (100, 200),
+            "priority": 1,
+            "dependencies": ["batch_003_flow_01"]
         }
     ]
 }
@@ -181,7 +176,7 @@ class SimulationWithTelemetry:
                 properties={
                     "simulationId": self.simulation_id,
                     "scenarioName": "Test Scenario",
-                    "startTime": datetime.utcnow().isoformat() + "Z",
+                    "startTime": datetime.now(timezone.utc).isoformat(),
                     "simulationStatus": "Initializing",
                     "totalFlowsCompleted": 0,
                     "totalEvents": 0
@@ -211,23 +206,33 @@ class SimulationWithTelemetry:
             # Stream final device states to ADT
             logger.info("\n5. Streaming final device states to Azure Digital Twins...")
             
+            # Get state history if available
+            state_history_all = result.get('state_history', [])
+            
             for device in result['device_states']:
                 device_id = device['device_id']
                 
-                # Calculate additional metrics
-                state_history = device.get('state_history', [])
-                total_idle = sum(s['duration'] for s in state_history if s['state'] == 'Idle')
-                total_processing = sum(s['duration'] for s in state_history if s['state'] == 'Processing')
-                total_blocked = sum(s['duration'] for s in state_history if s['state'] == 'Blocked')
+                # Find device config for capacity
+                device_config = next(
+                    (d for d in self.config['devices'] if d['id'] == device_id),
+                    None
+                )
+                capacity = device_config.get('capacity', 1) if device_config else 1
+                
+                # Calculate time-in-state metrics from state history
+                device_history = [h for h in state_history_all if h.get('device_id') == device_id]
+                total_idle = sum(h.get('duration', 0) for h in device_history if h.get('state') == 'Idle')
+                total_processing = sum(h.get('duration', 0) for h in device_history if h.get('state') == 'Processing')
+                total_blocked = sum(h.get('duration', 0) for h in device_history if h.get('state') == 'Blocked')
                 
                 await self.streamer.stream_device_update(
                     device_id=device_id,
                     status=device['final_state'],
-                    in_use=device['in_use'],
-                    capacity=device['capacity'],
-                    queue_length=device.get('queue_length', 0),
+                    in_use=0,  # Final state, nothing in use
+                    capacity=capacity,
+                    queue_length=0,
                     additional_properties={
-                        "totalProcessed": device.get('total_processed', 0),
+                        "totalProcessed": 0,  # Not tracked in basic output
                         "totalIdleTime": total_idle,
                         "totalProcessingTime": total_processing,
                         "totalBlockedTime": total_blocked
@@ -243,7 +248,7 @@ class SimulationWithTelemetry:
                 total_flows_completed=result['summary']['total_flows_completed'],
                 total_events=result['summary']['total_events'],
                 additional_properties={
-                    "endTime": datetime.utcnow().isoformat() + "Z",
+                    "endTime": datetime.now(timezone.utc).isoformat(),
                     "simulationTimeSeconds": result['summary']['simulation_time_seconds'],
                     "executionTimeSeconds": result['summary']['execution_time_seconds']
                 }
@@ -286,7 +291,7 @@ class SimulationWithTelemetry:
                     total_flows_completed=0,
                     total_events=0,
                     additional_properties={
-                        "endTime": datetime.utcnow().isoformat() + "Z",
+                        "endTime": datetime.now(timezone.utc).isoformat(),
                         "errorMessage": str(e)
                     }
                 )
