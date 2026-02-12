@@ -1,0 +1,102 @@
+{
+  "@context": "dtmi:dtdl:context;3",
+  "@id": "dtmi:platelet:Simulation;1",
+  "@type": "Interface",
+  "displayName": "Simulation Run",
+  "description": "Represents a simulation execution instance",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "simulationId",
+      "schema": "string",
+      "description": "Unique identifier for this simulation run"
+    },
+    {
+      "@type": "Property",
+      "name": "scenarioName",
+      "schema": "string",
+      "description": "Name of the scenario being simulated"
+    },
+    {
+      "@type": "Property",
+      "name": "startTime",
+      "schema": "dateTime",
+      "description": "When the simulation started"
+    },
+    {
+      "@type": "Property",
+      "name": "endTime",
+      "schema": "dateTime",
+      "description": "When the simulation ended"
+    },
+    {
+      "@type": "Property",
+      "name": "simulationStatus",
+      "schema": {
+        "@type": "Enum",
+        "valueSchema": "string",
+        "enumValues": [
+          {
+            "name": "Initializing",
+            "enumValue": "Initializing"
+          },
+          {
+            "name": "Running",
+            "enumValue": "Running"
+          },
+          {
+            "name": "Completed",
+            "enumValue": "Completed"
+          },
+          {
+            "name": "Failed",
+            "enumValue": "Failed"
+          }
+        ]
+      },
+      "description": "Current status of the simulation"
+    },
+    {
+      "@type": "Property",
+      "name": "totalFlowsCompleted",
+      "schema": "integer",
+      "description": "Total number of flows completed"
+    },
+    {
+      "@type": "Property",
+      "name": "totalEvents",
+      "schema": "integer",
+      "description": "Total number of events processed"
+    },
+    {
+      "@type": "Property",
+      "name": "simulationTimeSeconds",
+      "schema": "double",
+      "description": "Simulated time in seconds"
+    },
+    {
+      "@type": "Property",
+      "name": "executionTimeSeconds",
+      "schema": "double",
+      "description": "Real execution time in seconds"
+    },
+    {
+      "@type": "Property",
+      "name": "throughput",
+      "schema": "double",
+      "description": "Units per hour throughput"
+    },
+    {
+      "@type": "Property",
+      "name": "averageCycleTime",
+      "schema": "double",
+      "description": "Average cycle time in seconds"
+    },
+    {
+      "@type": "Relationship",
+      "name": "hasDevice",
+      "target": "dtmi:platelet:Device;1",
+      "description": "Devices included in this simulation"
+    }
+  ]
+}

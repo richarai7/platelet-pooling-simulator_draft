@@ -1,0 +1,108 @@
+{
+  "@context": "dtmi:dtdl:context;3",
+  "@id": "dtmi:platelet:ProcessFlow;1",
+  "@type": "Interface",
+  "displayName": "Platelet Processing Flow",
+  "description": "Represents a processing flow/batch through the system",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "flowId",
+      "schema": "string",
+      "description": "Unique identifier for this flow"
+    },
+    {
+      "@type": "Property",
+      "name": "batchId",
+      "schema": "string",
+      "description": "Batch identifier"
+    },
+    {
+      "@type": "Property",
+      "name": "currentDevice",
+      "schema": "string",
+      "description": "Device currently processing this flow"
+    },
+    {
+      "@type": "Property",
+      "name": "flowStatus",
+      "schema": {
+        "@type": "Enum",
+        "valueSchema": "string",
+        "enumValues": [
+          {
+            "name": "Waiting",
+            "enumValue": "Waiting"
+          },
+          {
+            "name": "InProgress",
+            "enumValue": "InProgress"
+          },
+          {
+            "name": "Completed",
+            "enumValue": "Completed"
+          },
+          {
+            "name": "Failed",
+            "enumValue": "Failed"
+          }
+        ]
+      },
+      "description": "Current status of the flow"
+    },
+    {
+      "@type": "Property",
+      "name": "startTime",
+      "schema": "dateTime",
+      "description": "When the flow started"
+    },
+    {
+      "@type": "Property",
+      "name": "completionTime",
+      "schema": "dateTime",
+      "description": "When the flow completed"
+    },
+    {
+      "@type": "Property",
+      "name": "totalDuration",
+      "schema": "double",
+      "description": "Total processing time in seconds"
+    },
+    {
+      "@type": "Property",
+      "name": "priority",
+      "schema": "integer",
+      "description": "Flow priority level"
+    },
+    {
+      "@type": "Property",
+      "name": "unitsIn",
+      "schema": "integer",
+      "description": "Number of units input to this flow"
+    },
+    {
+      "@type": "Property",
+      "name": "unitsOut",
+      "schema": "integer",
+      "description": "Number of units output from this flow"
+    },
+    {
+      "@type": "Property",
+      "name": "bloodGroup",
+      "schema": "string",
+      "description": "Blood group being processed"
+    },
+    {
+      "@type": "Property",
+      "name": "qualityScore",
+      "schema": "double",
+      "description": "Quality score (0-100)"
+    },
+    {
+      "@type": "Relationship",
+      "name": "processedBy",
+      "target": "dtmi:platelet:Device;1",
+      "description": "Device processing this flow"
+    }
+  ]
+}
