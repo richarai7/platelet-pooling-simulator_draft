@@ -1,0 +1,17 @@
+# Azure Integration Requirements
+# Install with: pip install -r requirements-azure.txt
+
+# Core Azure SDK packages
+azure-identity>=1.12.0
+azure-digitaltwins-core>=1.2.0
+
+# Azure Functions (optional, for function app mode)
+azure-functions>=1.18.0
+
+# Additional Azure services (optional)
+azure-eventhub>=5.11.0  # For Event Hubs integration
+azure-kusto-data>=4.3.0  # For Azure Data Explorer queries
+azure-kusto-ingest>=4.3.0  # For ADX ingestion
+
+# HTTP client
+requests>=2.31.0

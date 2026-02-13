@@ -1,0 +1,156 @@
+{
+  "@context": "dtmi:dtdl:context;3",
+  "@id": "dtmi:platelet:Device;1",
+  "@type": "Interface",
+  "displayName": "Platelet Processing Device",
+  "description": "Base model for all platelet processing equipment",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "deviceId",
+      "schema": "string",
+      "description": "Unique identifier for the device"
+    },
+    {
+      "@type": "Property",
+      "name": "deviceType",
+      "schema": "string",
+      "description": "Type of device (e.g., centrifuge, separator, macopress)"
+    },
+    {
+      "@type": "Property",
+      "name": "status",
+      "schema": {
+        "@type": "Enum",
+        "valueSchema": "string",
+        "enumValues": [
+          {
+            "name": "Idle",
+            "enumValue": "Idle"
+          },
+          {
+            "name": "Processing",
+            "enumValue": "Processing"
+          },
+          {
+            "name": "Blocked",
+            "enumValue": "Blocked"
+          },
+          {
+            "name": "Failed",
+            "enumValue": "Failed"
+          }
+        ]
+      },
+      "description": "Current operational status of the device"
+    },
+    {
+      "@type": "Property",
+      "name": "capacity",
+      "schema": "integer",
+      "description": "Maximum concurrent processing capacity"
+    },
+    {
+      "@type": "Property",
+      "name": "inUse",
+      "schema": "integer",
+      "description": "Current number of units being processed"
+    },
+    {
+      "@type": "Property",
+      "name": "utilizationRate",
+      "schema": "double",
+      "description": "Percentage utilization (0-100)"
+    },
+    {
+      "@type": "Property",
+      "name": "queueLength",
+      "schema": "integer",
+      "description": "Number of items waiting to be processed"
+    },
+    {
+      "@type": "Property",
+      "name": "totalProcessed",
+      "schema": "integer",
+      "description": "Total number of units processed"
+    },
+    {
+      "@type": "Property",
+      "name": "totalBlockedTime",
+      "schema": "double",
+      "description": "Total time spent in blocked state (seconds)"
+    },
+    {
+      "@type": "Property",
+      "name": "totalIdleTime",
+      "schema": "double",
+      "description": "Total time spent in idle state (seconds)"
+    },
+    {
+      "@type": "Property",
+      "name": "totalProcessingTime",
+      "schema": "double",
+      "description": "Total time spent processing (seconds)"
+    },
+    {
+      "@type": "Property",
+      "name": "location",
+      "schema": "string",
+      "description": "Physical location of the device"
+    },
+    {
+      "@type": "Property",
+      "name": "lastUpdateTime",
+      "schema": "dateTime",
+      "description": "Timestamp of last property update"
+    },
+    {
+      "@type": "Telemetry",
+      "name": "stateChange",
+      "schema": {
+        "@type": "Object",
+        "fields": [
+          {
+            "name": "previousState",
+            "schema": "string"
+          },
+          {
+            "name": "newState",
+            "schema": "string"
+          },
+          {
+            "name": "timestamp",
+            "schema": "dateTime"
+          },
+          {
+            "name": "reason",
+            "schema": "string"
+          }
+        ]
+      },
+      "description": "Event emitted when device state changes"
+    },
+    {
+      "@type": "Telemetry",
+      "name": "processingComplete",
+      "schema": {
+        "@type": "Object",
+        "fields": [
+          {
+            "name": "flowId",
+            "schema": "string"
+          },
+          {
+            "name": "duration",
+            "schema": "double"
+          },
+          {
+            "name": "timestamp",
+            "schema": "dateTime"
+          }
+        ]
+      },
+      "description": "Event emitted when a processing step completes"
+    }
+  ]
+}

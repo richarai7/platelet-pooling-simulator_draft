@@ -67,3 +67,12 @@ Thumbs.db
 
 # Output files
 quality-report.txt
+
+# Azure Functions
+azure_functions/local.settings.json
+azure_functions/.python_packages/
+azure_functions/__pycache__/
+azure_functions/.venv/
+
+# Azure credentials and config
+azure_config.json
