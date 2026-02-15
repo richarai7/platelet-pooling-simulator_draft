@@ -224,7 +224,7 @@ class SimulationADTRunner:
                 }
             )
             
-            # Flush any remaining updates
+            # Flush any remaining updates to ensure all batched updates are sent before completing the simulation
             await self.dt_client.flush_updates()
             
             logger.info("\n" + "=" * 80)
@@ -266,8 +266,8 @@ class SimulationADTRunner:
             total_processed = 0  # Count of COMPLETE_PROCESSING events
             
             # Calculate durations from state transitions
-            current_state = 'Idle'  # Devices start in Idle
-            last_timestamp = 0.0
+            current_state = 'Idle'  # Devices start in Idle state
+            last_timestamp = 0.0  # Simulation starts at time 0.0
             
             for event in device_events:
                 # Calculate duration in previous state
