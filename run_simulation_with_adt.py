@@ -224,6 +224,9 @@ class SimulationADTRunner:
                 }
             )
             
+            # Flush any remaining updates
+            await self.dt_client.flush_updates()
+            
             logger.info("\n" + "=" * 80)
             logger.info("✅ SIMULATION AND SYNC COMPLETE!")
             logger.info("=" * 80)
