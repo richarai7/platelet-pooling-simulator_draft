@@ -2,10 +2,12 @@ import sys
 import json
 import sqlite3
 import logging
+import os
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+import httpx
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -53,6 +55,151 @@ results_repo = ResultsRepository(db_path="scenarios.db")
 
 # Active simulations tracking: {simulation_id: engine_instance}
 active_simulations: Dict[str, SimulationEngine] = {}
+
+# Azure Function configuration
+AZURE_FUNCTION_ENDPOINT = os.getenv('AZURE_FUNCTION_ENDPOINT')
+AZURE_FUNCTION_KEY = os.getenv('AZURE_FUNCTION_KEY')
+ENABLE_AZURE_INTEGRATION = os.getenv('ENABLE_AZURE_INTEGRATION', 'false').lower() == 'true'
+
+
+def prepare_telemetry_from_results(results: Dict[str, Any], simulation_id: str) -> Dict[str, Any]:
+    """
+    Prepare telemetry payload from simulation results for Azure Function
+    
+    Args:
+        results: Simulation results dictionary
+        simulation_id: Unique simulation identifier
+    
+    Returns:
+        Telemetry payload in format expected by Azure Function
+    """
+    telemetry_batch = []
+    
+    # Add simulation twin telemetry
+    simulation_telemetry = {
+        "twin_id": simulation_id,
+        "properties": {
+            "simulationId": simulation_id,
+            "simulationStatus": "Completed",
+            "totalFlowsCompleted": results.get('summary', {}).get('total_flows_completed', 0),
+            "totalEvents": results.get('summary', {}).get('total_events', 0),
+            "simulationTimeSeconds": results.get('summary', {}).get('simulation_time_seconds', 0),
+            "executionTimeSeconds": results.get('summary', {}).get('execution_time_seconds', 0)
+        }
+    }
+    telemetry_batch.append(simulation_telemetry)
+    
+    # Add device telemetry from final states
+    device_states = results.get('device_states', [])
+    event_timeline = results.get('event_timeline', [])
+    simulation_time = results.get('summary', {}).get('simulation_time_seconds', 0)
+    
+    for device in device_states:
+        device_id = device.get('device_id')
+        if not device_id:
+            continue
+        
+        # Calculate metrics from event timeline (similar to run_simulation_with_adt.py)
+        device_events = [e for e in event_timeline if e.get('device_id') == device_id]
+        
+        total_idle = 0.0
+        total_processing = 0.0
+        total_blocked = 0.0
+        total_processed = 0
+        
+        current_state = 'Idle'
+        last_timestamp = 0.0
+        
+        for event in device_events:
+            duration = event['timestamp'] - last_timestamp
+            
+            if current_state == 'Idle':
+                total_idle += duration
+            elif current_state == 'Processing':
+                total_processing += duration
+            elif current_state == 'Blocked':
+                total_blocked += duration
+            
+            if event['event'] == 'COMPLETE_PROCESSING':
+                total_processed += 1
+            
+            current_state = event['to_state']
+            last_timestamp = event['timestamp']
+        
+        # Add final state duration
+        if device_events:
+            final_duration = simulation_time - last_timestamp
+            if current_state == 'Idle':
+                total_idle += final_duration
+            elif current_state == 'Processing':
+                total_processing += final_duration
+            elif current_state == 'Blocked':
+                total_blocked += final_duration
+        else:
+            total_idle = simulation_time
+        
+        device_telemetry = {
+            "twin_id": device_id,
+            "properties": {
+                "status": device.get('final_state', 'Idle'),
+                "inUse": 0,
+                "queueLength": 0,
+                "totalProcessed": total_processed,
+                "totalIdleTime": total_idle,
+                "totalProcessingTime": total_processing,
+                "totalBlockedTime": total_blocked
+            }
+        }
+        telemetry_batch.append(device_telemetry)
+    
+    return {"telemetry": telemetry_batch}
+
+
+async def send_telemetry_to_azure_function(telemetry: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    Send telemetry to Azure Function for Digital Twins update
+    
+    Args:
+        telemetry: Telemetry payload
+    
+    Returns:
+        Response from Azure Function or None if disabled/failed
+    """
+    if not ENABLE_AZURE_INTEGRATION:
+        logger.debug("Azure integration is disabled")
+        return None
+    
+    if not AZURE_FUNCTION_ENDPOINT:
+        logger.warning("Azure Function endpoint not configured")
+        return None
+    
+    try:
+        # Build request URL with function key if provided
+        url = AZURE_FUNCTION_ENDPOINT
+        headers = {"Content-Type": "application/json"}
+        
+        if AZURE_FUNCTION_KEY:
+            # Add function key as query parameter
+            url = f"{url}?code={AZURE_FUNCTION_KEY}"
+        
+        # Send telemetry to Azure Function
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(url, json=telemetry, headers=headers)
+            response.raise_for_status()
+            
+            result = response.json()
+            logger.info(f"Azure Function response: {result.get('success', 0)}/{result.get('processed', 0)} twins updated")
+            return result
+            
+    except httpx.HTTPStatusError as e:
+        logger.error(f"Azure Function HTTP error: {e.response.status_code} - {e.response.text}")
+        return None
+    except httpx.TimeoutException:
+        logger.error("Azure Function request timed out")
+        return None
+    except Exception as e:
+        logger.error(f"Error sending telemetry to Azure Function: {e}")
+        return None
 
 
 @app.get("/")
@@ -259,7 +406,7 @@ def delete_scenario(scenario_id: int):
 
 
 @app.post("/simulations/run", response_model=SimulationResultsResponse)
-def run_simulation(request: SimulationRunRequest):
+async def run_simulation(request: SimulationRunRequest):
     """Run a simulation with the provided configuration"""
     try:
         # Initialize and run simulation engine
@@ -324,6 +471,23 @@ def run_simulation(request: SimulationRunRequest):
                 logger.info(f"Results saved to database for {sim_id}")
             except Exception as db_error:
                 logger.warning(f"Failed to save to database: {db_error}")
+            
+            # Send telemetry to Azure Function for Digital Twins update
+            azure_response = None
+            if ENABLE_AZURE_INTEGRATION:
+                try:
+                    telemetry = prepare_telemetry_from_results(results, sim_id)
+                    azure_response = await send_telemetry_to_azure_function(telemetry)
+                    
+                    if azure_response:
+                        logger.info(f"Digital Twins updated: {azure_response.get('success', 0)} twins")
+                        results['metadata']['azure_twins_updated'] = azure_response.get('success', 0)
+                    else:
+                        logger.warning("Azure Function call did not return a response")
+                except Exception as azure_error:
+                    logger.error(f"Error updating Digital Twins: {azure_error}")
+                    # Don't fail the simulation if Azure update fails
+                    results['metadata']['azure_error'] = str(azure_error)
             
             return SimulationResultsResponse(
                 results=results,
