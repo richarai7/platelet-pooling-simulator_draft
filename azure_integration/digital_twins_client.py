@@ -240,6 +240,28 @@ class DigitalTwinsClientWrapper:
             self.logger.error(f"Failed to create/update twin {twin_id}: {e}")
             return False
     
+    async def delete_twin(self, twin_id: str) -> bool:
+        """
+        Delete a digital twin
+        
+        Args:
+            twin_id: ID of the twin to delete
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        if self.is_mock:
+            self.logger.info(f"[MOCK] Delete twin {twin_id}")
+            return True
+        
+        try:
+            self.client.delete_digital_twin(twin_id)
+            self.logger.info(f"Deleted twin {twin_id}")
+            return True
+        except Exception as e:
+            self.logger.error(f"Failed to delete twin {twin_id}: {e}")
+            return False
+    
     def close(self):
         """Close the client connection"""
         if self.client:

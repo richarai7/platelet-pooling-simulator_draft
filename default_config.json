@@ -1,0 +1,320 @@
+{
+  "simulation": {
+    "duration": 10000,
+    "random_seed": 42,
+    "execution_mode": "accelerated",
+    "speed_multiplier": 100,
+    "scenario_name": "Default Platelet Pooling Scenario"
+  },
+  "devices": [
+    {
+      "id": "centrifuge",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [180, 300],
+      "metadata": {
+        "location": "Lab A - Station 1",
+        "manufacturer": "Centrifuge Corp",
+        "model": "C-2000"
+      }
+    },
+    {
+      "id": "platelet_separator",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [120, 180],
+      "metadata": {
+        "location": "Lab A - Station 2",
+        "cost_per_hour": 75.5,
+        "maintenance_schedule": "Weekly",
+        "manufacturer": "MedTech Corp",
+        "model": "PS-3000"
+      }
+    },
+    {
+      "id": "pooling_station",
+      "type": "workstation",
+      "capacity": 3,
+      "initial_state": "Idle",
+      "recovery_time_range": [60, 120],
+      "metadata": {
+        "location": "Lab B - Station 1"
+      }
+    },
+    {
+      "id": "weigh_register",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [30, 60],
+      "metadata": {
+        "location": "Lab B - Station 2"
+      }
+    },
+    {
+      "id": "sterile_connect",
+      "type": "workstation",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [45, 90],
+      "metadata": {
+        "location": "Lab B - Station 3"
+      }
+    },
+    {
+      "id": "test_sample",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [60, 90],
+      "metadata": {
+        "location": "Lab C - Station 1"
+      }
+    },
+    {
+      "id": "quality_check",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [30, 60],
+      "metadata": {
+        "location": "Lab C - Station 2"
+      }
+    },
+    {
+      "id": "label_station",
+      "type": "workstation",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [20, 40],
+      "metadata": {
+        "location": "Lab C - Station 3"
+      }
+    },
+    {
+      "id": "storage_unit",
+      "type": "material",
+      "capacity": 50,
+      "initial_state": "Idle",
+      "recovery_time_range": [10, 20],
+      "metadata": {
+        "location": "Lab D - Cold Storage"
+      }
+    },
+    {
+      "id": "final_inspection",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [45, 75],
+      "metadata": {
+        "location": "Lab D - Station 1"
+      }
+    },
+    {
+      "id": "packaging_station",
+      "type": "workstation",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [30, 60],
+      "metadata": {
+        "location": "Lab D - Station 2"
+      }
+    }
+  ],
+  "flows": [
+    {
+      "flow_id": "batch_001_flow_01",
+      "from_device": "centrifuge",
+      "to_device": "platelet_separator",
+      "process_time_range": [300, 480],
+      "priority": 1,
+      "dependencies": null,
+      "batch_id": "batch_001",
+      "arrival_time": 0
+    },
+    {
+      "flow_id": "batch_001_flow_02",
+      "from_device": "platelet_separator",
+      "to_device": "pooling_station",
+      "process_time_range": [600, 900],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_01"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_03",
+      "from_device": "pooling_station",
+      "to_device": "weigh_register",
+      "process_time_range": [420, 600],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_02"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_04",
+      "from_device": "weigh_register",
+      "to_device": "sterile_connect",
+      "process_time_range": [240, 360],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_03"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_05",
+      "from_device": "sterile_connect",
+      "to_device": "test_sample",
+      "process_time_range": [180, 300],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_04"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_06",
+      "from_device": "test_sample",
+      "to_device": "quality_check",
+      "process_time_range": [360, 600],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_05"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_07",
+      "from_device": "quality_check",
+      "to_device": "label_station",
+      "process_time_range": [120, 240],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_06"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_08",
+      "from_device": "label_station",
+      "to_device": "storage_unit",
+      "process_time_range": [60, 120],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_07"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_09",
+      "from_device": "storage_unit",
+      "to_device": "final_inspection",
+      "process_time_range": [180, 300],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_08"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_10",
+      "from_device": "final_inspection",
+      "to_device": "packaging_station",
+      "process_time_range": [240, 360],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_09"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_002_flow_01",
+      "from_device": "centrifuge",
+      "to_device": "platelet_separator",
+      "process_time_range": [300, 480],
+      "priority": 1,
+      "dependencies": null,
+      "batch_id": "batch_002",
+      "arrival_time": 600
+    },
+    {
+      "flow_id": "batch_002_flow_02",
+      "from_device": "platelet_separator",
+      "to_device": "pooling_station",
+      "process_time_range": [600, 900],
+      "priority": 1,
+      "dependencies": ["batch_002_flow_01"],
+      "batch_id": "batch_002"
+    },
+    {
+      "flow_id": "batch_002_flow_03",
+      "from_device": "pooling_station",
+      "to_device": "weigh_register",
+      "process_time_range": [420, 600],
+      "priority": 1,
+      "dependencies": ["batch_002_flow_02"],
+      "batch_id": "batch_002"
+    },
+    {
+      "flow_id": "batch_002_flow_04",
+      "from_device": "weigh_register",
+      "to_device": "sterile_connect",
+      "process_time_range": [240, 360],
+      "priority": 1,
+      "dependencies": ["batch_002_flow_03"],
+      "batch_id": "batch_002"
+    },
+    {
+      "flow_id": "batch_002_flow_05",
+      "from_device": "sterile_connect",
+      "to_device": "test_sample",
+      "process_time_range": [180, 300],
+      "priority": 1,
+      "dependencies": ["batch_002_flow_04"],
+      "batch_id": "batch_002"
+    },
+    {
+      "flow_id": "batch_002_flow_06",
+      "from_device": "test_sample",
+      "to_device": "quality_check",
+      "process_time_range": [360, 600],
+      "priority": 1,
+      "dependencies": ["batch_002_flow_05"],
+      "batch_id": "batch_002"
+    },
+    {
+      "flow_id": "batch_002_flow_07",
+      "from_device": "quality_check",
+      "to_device": "label_station",
+      "process_time_range": [120, 240],
+      "priority": 1,
+      "dependencies": ["batch_002_flow_06"],
+      "batch_id": "batch_002"
+    },
+    {
+      "flow_id": "batch_002_flow_08",
+      "from_device": "label_station",
+      "to_device": "storage_unit",
+      "process_time_range": [60, 120],
+      "priority": 1,
+      "dependencies": ["batch_002_flow_07"],
+      "batch_id": "batch_002"
+    },
+    {
+      "flow_id": "batch_002_flow_09",
+      "from_device": "storage_unit",
+      "to_device": "final_inspection",
+      "process_time_range": [180, 300],
+      "priority": 1,
+      "dependencies": ["batch_002_flow_08"],
+      "batch_id": "batch_002"
+    },
+    {
+      "flow_id": "batch_002_flow_10",
+      "from_device": "final_inspection",
+      "to_device": "packaging_station",
+      "process_time_range": [240, 360],
+      "priority": 1,
+      "dependencies": ["batch_002_flow_09"],
+      "batch_id": "batch_002"
+    }
+  ],
+  "gates": {
+    "QC_Pass": true,
+    "Sterile_Conditions": true,
+    "Temperature_Control": true
+  },
+  "output_options": {
+    "include_events": true,
+    "include_history": true
+  }
+}

@@ -2,7 +2,8 @@
   "simulation": {
     "duration": 43200,
     "random_seed": 42,
-    "execution_mode": "accelerated"
+    "execution_mode": "accelerated",
+    "speed_multiplier": 100
   },
   "devices": [
     {
