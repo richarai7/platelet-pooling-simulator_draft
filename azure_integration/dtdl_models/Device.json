@@ -100,6 +100,54 @@
     },
     {
       "@type": "Property",
+      "name": "position",
+      "schema": {
+        "@type": "Object",
+        "fields": [
+          {
+            "name": "x",
+            "schema": "double"
+          },
+          {
+            "name": "y",
+            "schema": "double"
+          },
+          {
+            "name": "z",
+            "schema": "double"
+          }
+        ]
+      },
+      "description": "3D position coordinates for visualization in Azure 3D Scenes Studio"
+    },
+    {
+      "@type": "Property",
+      "name": "rotation",
+      "schema": {
+        "@type": "Object",
+        "fields": [
+          {
+            "name": "x",
+            "schema": "double"
+          },
+          {
+            "name": "y",
+            "schema": "double"
+          },
+          {
+            "name": "z",
+            "schema": "double"
+          },
+          {
+            "name": "w",
+            "schema": "double"
+          }
+        ]
+      },
+      "description": "Quaternion rotation for 3D visualization in Azure 3D Scenes Studio"
+    },
+    {
+      "@type": "Property",
       "name": "lastUpdateTime",
       "schema": "dateTime",
       "description": "Timestamp of last property update"

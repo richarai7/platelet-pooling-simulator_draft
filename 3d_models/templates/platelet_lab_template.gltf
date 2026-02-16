@@ -1,0 +1,406 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Platelet Pooling Simulator - Azure Digital Twins Integration",
+    "copyright": "2024"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Platelet Pooling Lab",
+      "nodes": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "buffy_coat_packs",
+      "mesh": 0,
+      "translation": [0, 0, 0],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1],
+      "extras": {
+        "twinId": "buffy_coat_packs",
+        "deviceType": "material",
+        "location": "Lab A - Station 1",
+        "description": "Initial blood product storage",
+        "capacity": 5,
+        "dtmi": "dtmi:platelet:Device;1"
+      }
+    },
+    {
+      "name": "platelet_washing",
+      "mesh": 1,
+      "translation": [2, 0, 0],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1],
+      "extras": {
+        "twinId": "platelet_washing",
+        "deviceType": "machine",
+        "location": "Lab A - Station 2",
+        "description": "Washing and preparation",
+        "capacity": 2,
+        "dtmi": "dtmi:platelet:Device;1"
+      }
+    },
+    {
+      "name": "centrifuge",
+      "mesh": 2,
+      "translation": [4, 0, 0],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1],
+      "extras": {
+        "twinId": "centrifuge",
+        "deviceType": "machine",
+        "location": "Lab A - Station 3",
+        "description": "Separation by centrifugation",
+        "capacity": 2,
+        "dtmi": "dtmi:platelet:Device;1"
+      }
+    },
+    {
+      "name": "separator_macropress",
+      "mesh": 3,
+      "translation": [6, 0, 0],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1],
+      "extras": {
+        "twinId": "separator_macropress",
+        "deviceType": "machine",
+        "location": "Lab B - Station 1",
+        "description": "Platelet separation",
+        "capacity": 2,
+        "dtmi": "dtmi:platelet:Device;1"
+      }
+    },
+    {
+      "name": "resting_trolly",
+      "mesh": 4,
+      "translation": [8, 0, 0],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1],
+      "extras": {
+        "twinId": "resting_trolly",
+        "deviceType": "material",
+        "location": "Lab B - Station 2",
+        "description": "Temporary storage/resting",
+        "capacity": 10,
+        "dtmi": "dtmi:platelet:Device;1"
+      }
+    },
+    {
+      "name": "agitator",
+      "mesh": 5,
+      "translation": [0, 0, 2],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1],
+      "extras": {
+        "twinId": "agitator",
+        "deviceType": "machine",
+        "location": "Lab B - Station 3",
+        "description": "Mixing and agitation",
+        "capacity": 3,
+        "dtmi": "dtmi:platelet:Device;1"
+      }
+    },
+    {
+      "name": "macropress",
+      "mesh": 6,
+      "translation": [2, 0, 2],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1],
+      "extras": {
+        "twinId": "macropress",
+        "deviceType": "machine",
+        "location": "Lab C - Station 1",
+        "description": "Final pressing",
+        "capacity": 2,
+        "dtmi": "dtmi:platelet:Device;1"
+      }
+    },
+    {
+      "name": "testing_agitator",
+      "mesh": 7,
+      "translation": [4, 0, 2],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1],
+      "extras": {
+        "twinId": "testing_agitator",
+        "deviceType": "machine",
+        "location": "Lab C - Station 2",
+        "description": "Quality testing",
+        "capacity": 2,
+        "dtmi": "dtmi:platelet:Device;1"
+      }
+    },
+    {
+      "name": "labeling",
+      "mesh": 8,
+      "translation": [6, 0, 2],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1],
+      "extras": {
+        "twinId": "labeling",
+        "deviceType": "workstation",
+        "location": "Lab C - Station 3",
+        "description": "Product labeling",
+        "capacity": 2,
+        "dtmi": "dtmi:platelet:Device;1"
+      }
+    },
+    {
+      "name": "release",
+      "mesh": 9,
+      "translation": [8, 0, 2],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1],
+      "extras": {
+        "twinId": "release",
+        "deviceType": "workstation",
+        "location": "Lab D - Release Area",
+        "description": "Final release checkpoint",
+        "capacity": 5,
+        "dtmi": "dtmi:platelet:Device;1"
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "buffy_coat_packs_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "platelet_washing_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 1
+        }
+      ]
+    },
+    {
+      "name": "centrifuge_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 2
+        }
+      ]
+    },
+    {
+      "name": "separator_macropress_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 3
+        }
+      ]
+    },
+    {
+      "name": "resting_trolly_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 4
+        }
+      ]
+    },
+    {
+      "name": "agitator_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 5
+        }
+      ]
+    },
+    {
+      "name": "macropress_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 6
+        }
+      ]
+    },
+    {
+      "name": "testing_agitator_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 7
+        }
+      ]
+    },
+    {
+      "name": "labeling_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 8
+        }
+      ]
+    },
+    {
+      "name": "release_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 9
+        }
+      ]
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 8,
+      "type": "VEC3",
+      "max": [0.5, 0.5, 0.5],
+      "min": [-0.5, -0.5, -0.5]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5123,
+      "count": 36,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 96,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 96,
+      "byteLength": 72,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 168,
+      "uri": "data:application/octet-stream;base64,AAAAAL8AAAC/AAAAPwAAAL8AAAC/AAAAvwAAAD8AAAC/AAAAPwAAAD8AAAC/AAAAAL8AAAA/AAAAPwAAAL8AAAA/AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAA/AAEAAgADAAIAAQAEAAUABgAHAAYABQAIAAkACgALAAoACQAMAA0ADgAPAA4ADQAQABEAEQASABMA"
+    }
+  ],
+  "materials": [
+    {
+      "name": "buffy_coat_material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.8, 0.2, 0.2, 1.0],
+        "metallicFactor": 0.1,
+        "roughnessFactor": 0.9
+      }
+    },
+    {
+      "name": "washing_material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.2, 0.4, 0.8, 1.0],
+        "metallicFactor": 0.5,
+        "roughnessFactor": 0.5
+      }
+    },
+    {
+      "name": "centrifuge_material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.3, 0.6, 0.3, 1.0],
+        "metallicFactor": 0.6,
+        "roughnessFactor": 0.4
+      }
+    },
+    {
+      "name": "separator_material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.7, 0.5, 0.2, 1.0],
+        "metallicFactor": 0.5,
+        "roughnessFactor": 0.5
+      }
+    },
+    {
+      "name": "trolly_material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.6, 0.6, 0.6, 1.0],
+        "metallicFactor": 0.3,
+        "roughnessFactor": 0.7
+      }
+    },
+    {
+      "name": "agitator_material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.4, 0.3, 0.7, 1.0],
+        "metallicFactor": 0.5,
+        "roughnessFactor": 0.5
+      }
+    },
+    {
+      "name": "macropress_material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.7, 0.3, 0.5, 1.0],
+        "metallicFactor": 0.6,
+        "roughnessFactor": 0.4
+      }
+    },
+    {
+      "name": "testing_material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.5, 0.7, 0.3, 1.0],
+        "metallicFactor": 0.4,
+        "roughnessFactor": 0.6
+      }
+    },
+    {
+      "name": "labeling_material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.8, 0.8, 0.3, 1.0],
+        "metallicFactor": 0.2,
+        "roughnessFactor": 0.8
+      }
+    },
+    {
+      "name": "release_material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.3, 0.8, 0.8, 1.0],
+        "metallicFactor": 0.3,
+        "roughnessFactor": 0.7
+      }
+    }
+  ]
+}
