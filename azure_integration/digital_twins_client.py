@@ -262,6 +262,54 @@ class DigitalTwinsClientWrapper:
             self.logger.error(f"Failed to delete twin {twin_id}: {e}")
             return False
     
+    async def create_relationship(
+        self,
+        source_twin_id: str,
+        relationship_id: str,
+        target_twin_id: str,
+        relationship_name: str = "feedsInto",
+        properties: Optional[Dict[str, Any]] = None
+    ) -> bool:
+        """
+        Create a relationship between two twins
+        
+        Args:
+            source_twin_id: Source twin ID
+            relationship_id: Unique ID for this relationship
+            target_twin_id: Target twin ID
+            relationship_name: Name of the relationship (default: "feedsInto")
+            properties: Optional relationship properties
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        if self.is_mock:
+            self.logger.info(f"[MOCK] Create relationship: {source_twin_id} -[{relationship_name}]-> {target_twin_id}")
+            return True
+        
+        try:
+            relationship_data = {
+                "$relationshipId": relationship_id,
+                "$sourceId": source_twin_id,
+                "$relationshipName": relationship_name,
+                "$targetId": target_twin_id
+            }
+            
+            if properties:
+                relationship_data.update(properties)
+            
+            self.client.upsert_relationship(
+                source_twin_id,
+                relationship_id,
+                relationship_data
+            )
+            self.logger.info(f"Created relationship: {source_twin_id} -> {target_twin_id}")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Failed to create relationship {relationship_id}: {e}")
+            return False
+    
     def close(self):
         """Close the client connection"""
         if self.client:

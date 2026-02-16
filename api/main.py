@@ -63,17 +63,16 @@ ENABLE_AZURE_INTEGRATION = os.getenv('ENABLE_AZURE_INTEGRATION', 'false').lower(
 
 # Device ID mapping: simulation -> Azure Digital Twins
 DEVICE_ID_MAPPING = {
+    "buffy_coat_packs": "buffy_coat_packs",
+    "platelet_washing": "platelet_washing",
     "centrifuge": "centrifuge",
-    "platelet_separator": "platelet_separator",
-    "pooling_station": "pooling_station",
-    "weigh_register": "weigh_register",
-    "sterile_connect": "sterile_connect",
-    "test_sample": "test_sample",
-    "quality_check": "quality_check",
-    "label_station": "label_station",
-    "storage_unit": "storage_unit",
-    "final_inspection": "final_inspection",
-    "packaging_station": "packaging_station"
+    "separator_macropress": "separator_macropress",
+    "resting_trolly": "resting_trolly",
+    "agitator": "agitator",
+    "macropress": "macropress",
+    "testing_agitator": "testing_agitator",
+    "labeling": "labeling",
+    "release": "release"
 }
 
 

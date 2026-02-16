@@ -1,0 +1,214 @@
+{
+  "simulation": {
+    "duration": 10000,
+    "random_seed": 42,
+    "execution_mode": "accelerated",
+    "speed_multiplier": 100,
+    "scenario_name": "Platelet Pooling Linear Flow"
+  },
+  "devices": [
+    {
+      "id": "buffy_coat_packs",
+      "type": "material",
+      "capacity": 5,
+      "initial_state": "Idle",
+      "recovery_time_range": [60, 120],
+      "metadata": {
+        "location": "Lab A - Station 1",
+        "deviceType": "buffy_coat_packs"
+      }
+    },
+    {
+      "id": "platelet_washing",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [180, 300],
+      "metadata": {
+        "location": "Lab A - Station 2",
+        "deviceType": "platelet_washing"
+      }
+    },
+    {
+      "id": "centrifuge",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [180, 300],
+      "metadata": {
+        "location": "Lab A - Station 3",
+        "deviceType": "centrifuge"
+      }
+    },
+    {
+      "id": "separator_macropress",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [120, 240],
+      "metadata": {
+        "location": "Lab B - Station 1",
+        "deviceType": "separator_macropress"
+      }
+    },
+    {
+      "id": "resting_trolly",
+      "type": "material",
+      "capacity": 10,
+      "initial_state": "Idle",
+      "recovery_time_range": [30, 60],
+      "metadata": {
+        "location": "Lab B - Station 2",
+        "deviceType": "resting_trolly"
+      }
+    },
+    {
+      "id": "agitator",
+      "type": "machine",
+      "capacity": 3,
+      "initial_state": "Idle",
+      "recovery_time_range": [90, 150],
+      "metadata": {
+        "location": "Lab B - Station 3",
+        "deviceType": "agitator"
+      }
+    },
+    {
+      "id": "macropress",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [120, 180],
+      "metadata": {
+        "location": "Lab C - Station 1",
+        "deviceType": "macropress"
+      }
+    },
+    {
+      "id": "testing_agitator",
+      "type": "machine",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [60, 120],
+      "metadata": {
+        "location": "Lab C - Station 2",
+        "deviceType": "testing_agitator"
+      }
+    },
+    {
+      "id": "labeling",
+      "type": "workstation",
+      "capacity": 2,
+      "initial_state": "Idle",
+      "recovery_time_range": [30, 60],
+      "metadata": {
+        "location": "Lab C - Station 3",
+        "deviceType": "labeling"
+      }
+    },
+    {
+      "id": "release",
+      "type": "workstation",
+      "capacity": 5,
+      "initial_state": "Idle",
+      "recovery_time_range": [20, 40],
+      "metadata": {
+        "location": "Lab D - Release Area",
+        "deviceType": "release"
+      }
+    }
+  ],
+  "flows": [
+    {
+      "flow_id": "batch_001_flow_01",
+      "from_device": "buffy_coat_packs",
+      "to_device": "platelet_washing",
+      "process_time_range": [200, 300],
+      "priority": 1,
+      "dependencies": null,
+      "batch_id": "batch_001",
+      "arrival_time": 0
+    },
+    {
+      "flow_id": "batch_001_flow_02",
+      "from_device": "platelet_washing",
+      "to_device": "centrifuge",
+      "process_time_range": [300, 480],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_01"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_03",
+      "from_device": "centrifuge",
+      "to_device": "separator_macropress",
+      "process_time_range": [400, 600],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_02"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_04",
+      "from_device": "separator_macropress",
+      "to_device": "resting_trolly",
+      "process_time_range": [150, 250],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_03"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_05",
+      "from_device": "resting_trolly",
+      "to_device": "agitator",
+      "process_time_range": [300, 450],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_04"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_06",
+      "from_device": "agitator",
+      "to_device": "macropress",
+      "process_time_range": [200, 350],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_05"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_07",
+      "from_device": "macropress",
+      "to_device": "testing_agitator",
+      "process_time_range": [250, 400],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_06"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_08",
+      "from_device": "testing_agitator",
+      "to_device": "labeling",
+      "process_time_range": [120, 200],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_07"],
+      "batch_id": "batch_001"
+    },
+    {
+      "flow_id": "batch_001_flow_09",
+      "from_device": "labeling",
+      "to_device": "release",
+      "process_time_range": [100, 150],
+      "priority": 1,
+      "dependencies": ["batch_001_flow_08"],
+      "batch_id": "batch_001"
+    }
+  ],
+  "gates": {
+    "QC_Pass": true,
+    "Sterile_Conditions": true,
+    "Temperature_Control": true
+  },
+  "output_options": {
+    "include_events": true,
+    "include_history": true
+  }
+}
