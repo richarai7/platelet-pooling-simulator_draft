@@ -83,6 +83,145 @@ pip install -r requirements-azure.txt
 pip install -e ".[dev]"
 ```
 
+## How to Run E2E Locally & in CI
+
+### Prerequisites
+
+1. **Azure Resources** (if using Azure integration):
+   - Azure Digital Twins instance
+   - Azure Function App (optional - direct ADT connection also supported)
+   - Proper role assignments configured
+
+2. **Local Setup**:
+   - Python 3.9+
+   - Dependencies installed (`pip install -r requirements.txt`)
+
+### Local Testing (Without Azure)
+
+For local development without Azure resources:
+
+```bash
+# 1. Start the API server
+export ENABLE_AZURE_INTEGRATION=false
+uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+
+# 2. In another terminal, run the smoke test
+python smoke_test.py --skip-simulation  # Quick test
+# or
+python smoke_test.py  # Full test with simulation
+```
+
+Expected output:
+```
+✅ Test 1: API Health Check
+✅ Test 2: Template Configuration
+✅ Test 3: Device ID Mapping
+⏭️  Test 4: Azure Configuration (skipped: Azure integration disabled)
+```
+
+### Local Testing (With Azure)
+
+For testing the complete E2E flow with Azure:
+
+```bash
+# 1. Configure Azure credentials
+az login
+
+# 2. Set environment variables
+export ENABLE_AZURE_INTEGRATION=true
+export AZURE_DIGITAL_TWINS_ENDPOINT="https://your-instance.api.eus.digitaltwins.azure.net"
+# Optional: Use Function App instead of direct connection
+export AZURE_FUNCTION_ENDPOINT="https://your-function.azurewebsites.net/api/ProcessSimulationTelemetry"
+export AZURE_FUNCTION_KEY="your-function-key"
+
+# 3. Create twins if not already done
+python azure_integration/scripts/create_linear_flow_twins.py \
+  --endpoint $AZURE_DIGITAL_TWINS_ENDPOINT
+
+# 4. Start the API server
+uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+
+# 5. Run smoke test
+python smoke_test.py
+```
+
+Expected output:
+```
+✅ Test 1: API Health Check
+✅ Test 2: Template Configuration
+✅ Test 3: Device ID Mapping
+✅ Test 4: Azure Configuration
+✅ Test 5: Simulation Execution
+✅ Test 6: Azure Update Verification
+```
+
+### CI/CD Integration
+
+For automated testing in CI pipelines:
+
+```yaml
+# Example GitHub Actions workflow
+name: E2E Smoke Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -e .
+      
+      - name: Start API server
+        run: |
+          export ENABLE_AZURE_INTEGRATION=false
+          uvicorn api.main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+      
+      - name: Run smoke test
+        run: python smoke_test.py --skip-simulation
+```
+
+### Troubleshooting E2E Flow
+
+If the E2E flow is not working:
+
+1. **Check API is running**:
+   ```bash
+   curl http://localhost:8000/
+   ```
+
+2. **Verify device configuration**:
+   ```bash
+   curl http://localhost:8000/templates/platelet-pooling | jq '.devices[].id'
+   ```
+
+3. **Test Azure Function permissions** (if using Function App):
+   ```bash
+   ./configure_function_permissions.sh <resource-group> <function-app> <dt-instance>
+   ```
+
+4. **Check Function App logs**:
+   ```bash
+   az webapp log tail --name <function-app> --resource-group <resource-group>
+   ```
+
+5. **Verify twins exist in ADT**:
+   ```bash
+   az dt twin query --dt-name <instance> --query-command "SELECT * FROM DIGITALTWINS"
+   ```
+
+See [docs/FUNCTION_APP_PERMISSIONS.md](docs/FUNCTION_APP_PERMISSIONS.md) for detailed troubleshooting.
+
 ## Quick Start - Platelet Pooling Simulation
 
 ### 1. Run Local Simulation
