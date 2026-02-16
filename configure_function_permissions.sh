@@ -148,8 +148,8 @@ fi
 # Count twins in ADT
 TWIN_COUNT=$(az dt twin query \
   --dt-name $DT_INSTANCE \
-  --query-command "SELECT COUNT() FROM DIGITALTWINS" \
-  --query "result[0].\$count" -o tsv 2>/dev/null || echo "0")
+  --query-command 'SELECT COUNT() FROM DIGITALTWINS' \
+  --query 'result[0].$count' -o tsv 2>/dev/null || echo "0")
 
 echo "   Twins in ADT: $TWIN_COUNT"
 

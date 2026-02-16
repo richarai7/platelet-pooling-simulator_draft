@@ -11,6 +11,7 @@ import logging
 import json
 import os
 import time
+import traceback
 from typing import Dict, Any, Optional, Tuple
 import azure.functions as func
 from azure.identity import ManagedIdentityCredential
@@ -98,7 +99,12 @@ def update_twin_with_retry(twin_id: str, properties: Dict[str, Any]) -> Tuple[bo
             # Don't retry on 4xx errors (except 429 rate limiting)
             if isinstance(status_code, int) and 400 <= status_code < 500 and status_code != 429:
                 logging.error(f"❌ {error_msg}: {str(e)}")
-                logging.error(f"   Response: {e.response.text() if hasattr(e.response, 'text') else 'N/A'}")
+                # Safely get response text
+                try:
+                    response_text = e.response.text() if hasattr(e, 'response') and hasattr(e.response, 'text') else 'N/A'
+                    logging.error(f"   Response: {response_text}")
+                except Exception:
+                    logging.error(f"   Response: Unable to retrieve response text")
                 return False, error_msg
             
             # Retry on 5xx errors and 429
@@ -239,7 +245,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
     except Exception as e:
         logging.error(f"❌ Unexpected error: {type(e).__name__}: {e}")
-        import traceback
         logging.error(f"   Stack trace: {traceback.format_exc()}")
         return func.HttpResponse(
             json.dumps({

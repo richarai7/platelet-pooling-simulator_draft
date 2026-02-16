@@ -23,9 +23,26 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+def parse_bool_env(value: str, default: bool = False) -> bool:
+    """
+    Parse boolean environment variable robustly
+    
+    Args:
+        value: String value from environment
+        default: Default value if parsing fails
+        
+    Returns:
+        Boolean value
+    """
+    if not value:
+        return default
+    return value.lower() in ('true', '1', 'yes', 'on')
+
+
 # Test configuration
 API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost:8000')
-AZURE_ENABLED = os.getenv('ENABLE_AZURE_INTEGRATION', 'false').lower() == 'true'
+AZURE_ENABLED = parse_bool_env(os.getenv('ENABLE_AZURE_INTEGRATION', 'false'))
 
 # Expected device names (10 devices in linear flow)
 EXPECTED_DEVICES = [
@@ -129,10 +146,18 @@ def test_template_endpoint() -> Tuple[bool, str]:
 def test_device_mapping() -> Tuple[bool, str]:
     """Test 3: Device ID mapping matches twin IDs"""
     try:
-        # Read device mapping from API code
-        import sys
-        sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'api'))
-        from api.main import DEVICE_ID_MAPPING
+        # Import from the api package more safely
+        import importlib.util
+        api_main_path = os.path.join(os.path.dirname(__file__), 'api', 'main.py')
+        
+        spec = importlib.util.spec_from_file_location("api.main", api_main_path)
+        if spec is None or spec.loader is None:
+            return False, "Cannot load api.main module"
+        
+        api_main = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(api_main)
+        
+        DEVICE_ID_MAPPING = api_main.DEVICE_ID_MAPPING
         
         # Check mapping exists for all expected devices
         missing = []
