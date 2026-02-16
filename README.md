@@ -8,6 +8,7 @@
 - **[LINEAR_FLOW_SETUP.md](LINEAR_FLOW_SETUP.md)** - Complete setup guide for Azure Digital Twins integration
 - **[QUICK_START_GUIDE.md](docs/QUICK_START_GUIDE.md)** - Get running in 2 minutes
 - **[END_TO_END_GUIDE.md](docs/END_TO_END_GUIDE.md)** - Complete instructions for all features
+- **[WHY_AZURE_INTEGRATION_DISABLED.md](WHY_AZURE_INTEGRATION_DISABLED.md)** - Why Azure integration is disabled and how to enable it
 
 ## 🩸 Platelet Pooling Linear Flow
 
@@ -82,6 +83,23 @@ pip install -r requirements-azure.txt
 # Install dev dependencies (optional)
 pip install -e ".[dev]"
 ```
+
+## ❓ Why is Azure Integration Disabled?
+
+**Azure integration is disabled by default** to allow local development without Azure resources.
+
+**Check status**:
+```bash
+./check_azure_integration.sh
+```
+
+**To enable**:
+```bash
+export ENABLE_AZURE_INTEGRATION=true
+export AZURE_FUNCTION_ENDPOINT="https://your-function-app.azurewebsites.net/api/ProcessSimulationTelemetry"
+```
+
+See **[WHY_AZURE_INTEGRATION_DISABLED.md](WHY_AZURE_INTEGRATION_DISABLED.md)** for complete details.
 
 ## How to Run E2E Locally & in CI
 
