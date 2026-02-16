@@ -26,7 +26,7 @@ from .models import (
     SimulationRunRequest,
     SimulationResultsResponse
 )
-from .templates import get_platelet_template
+from .templates import get_platelet_template, get_multi_batch_template
 
 # Add parent directory for capacity_multiplier
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -60,6 +60,26 @@ active_simulations: Dict[str, SimulationEngine] = {}
 AZURE_FUNCTION_ENDPOINT = os.getenv('AZURE_FUNCTION_ENDPOINT')
 AZURE_FUNCTION_KEY = os.getenv('AZURE_FUNCTION_KEY')
 ENABLE_AZURE_INTEGRATION = os.getenv('ENABLE_AZURE_INTEGRATION', 'false').lower() == 'true'
+
+# Device ID mapping: simulation -> Azure Digital Twins
+DEVICE_ID_MAPPING = {
+    "centrifuge": "centrifuge",
+    "platelet_separator": "platelet_separator",
+    "pooling_station": "pooling_station",
+    "weigh_register": "weigh_register",
+    "sterile_connect": "sterile_connect",
+    "test_sample": "test_sample",
+    "quality_check": "quality_check",
+    "label_station": "label_station",
+    "storage_unit": "storage_unit",
+    "final_inspection": "final_inspection",
+    "packaging_station": "packaging_station"
+}
+
+
+def map_device_id_to_twin(device_id: str) -> str:
+    """Map simulation device ID to Azure Digital Twin ID"""
+    return DEVICE_ID_MAPPING.get(device_id, device_id)
 
 
 def prepare_telemetry_from_results(results: Dict[str, Any], simulation_id: str) -> Dict[str, Any]:
@@ -98,6 +118,9 @@ def prepare_telemetry_from_results(results: Dict[str, Any], simulation_id: str) 
         device_id = device.get('device_id')
         if not device_id:
             continue
+        
+        # Map simulation device ID to Azure Digital Twin ID
+        twin_id = map_device_id_to_twin(device_id)
         
         # Calculate metrics from event timeline (similar to run_simulation_with_adt.py)
         device_events = [e for e in event_timeline if e.get('device_id') == device_id]
@@ -139,7 +162,7 @@ def prepare_telemetry_from_results(results: Dict[str, Any], simulation_id: str) 
             total_idle = simulation_time
         
         device_telemetry = {
-            "twin_id": device_id,
+            "twin_id": twin_id,  # Use mapped Azure Digital Twin ID
             "properties": {
                 "status": device.get('final_state', 'Idle'),
                 "inUse": 0,
@@ -170,8 +193,13 @@ async def send_telemetry_to_azure_function(telemetry: Dict[str, Any]) -> Optiona
         return None
     
     if not AZURE_FUNCTION_ENDPOINT:
-        logger.warning("Azure Function endpoint not configured")
-        return None
+        logger.warning("Azure Function endpoint not configured - using direct Azure Digital Twins connection")
+        # Fallback to direct ADT connection
+        return await send_telemetry_direct_to_adt(telemetry)
+    
+    # Log telemetry being sent
+    twin_ids = [t.get('twin_id') for t in telemetry.get('telemetry', [])]
+    logger.info(f"Sending telemetry for {len(twin_ids)} twins to Azure Function...")
     
     try:
         # Build request URL with function key if provided
@@ -192,13 +220,76 @@ async def send_telemetry_to_azure_function(telemetry: Dict[str, Any]) -> Optiona
             return result
             
     except httpx.HTTPStatusError as e:
-        logger.error(f"Azure Function HTTP error: {e.response.status_code} - {e.response.text}")
-        return None
+        logger.error(f"Azure Function HTTP error: {e.response.status_code} - falling back to direct ADT")
+        # Fallback to direct connection
+        return await send_telemetry_direct_to_adt(telemetry)
     except httpx.TimeoutException:
-        logger.error("Azure Function request timed out")
-        return None
+        logger.error("Azure Function request timed out - falling back to direct ADT")
+        return await send_telemetry_direct_to_adt(telemetry)
     except Exception as e:
-        logger.error(f"Error sending telemetry to Azure Function: {e}")
+        logger.error(f"Error sending telemetry to Azure Function: {e} - falling back to direct ADT")
+        return await send_telemetry_direct_to_adt(telemetry)
+
+
+async def send_telemetry_direct_to_adt(telemetry: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    Send telemetry directly to Azure Digital Twins (fallback method)
+    
+    Args:
+        telemetry: Telemetry payload
+    
+    Returns:
+        Response with update status or None if failed
+    """
+    try:
+        from azure.identity import DefaultAzureCredential
+        from azure.digitaltwins.core import DigitalTwinsClient
+        
+        # Connect to Azure Digital Twins
+        adt_endpoint = os.getenv('AZURE_DIGITAL_TWINS_ENDPOINT', 'https://platelet-dt-instance-new.api.eus.digitaltwins.azure.net')
+        credential = DefaultAzureCredential()
+        dt_client = DigitalTwinsClient(adt_endpoint, credential)
+        
+        success_count = 0
+        failed_updates = []
+        
+        for update in telemetry.get('telemetry', []):
+            twin_id = update.get('twin_id')
+            properties = update.get('properties', {})
+            
+            if not twin_id:
+                continue
+            
+            try:
+                # Create JSON patch for update
+                patch = []
+                for key, value in properties.items():
+                    patch.append({
+                        "op": "replace",
+                        "path": f"/{key}",
+                        "value": value
+                    })
+                
+                # Update twin
+                dt_client.update_digital_twin(twin_id, patch)
+                success_count += 1
+                logger.debug(f"Updated twin {twin_id} (direct)")
+                
+            except Exception as e:
+                logger.error(f"Failed to update twin {twin_id}: {e}")
+                failed_updates.append({"twin_id": twin_id, "error": str(e)})
+        
+        result = {
+            "processed": len(telemetry.get('telemetry', [])),
+            "success": success_count,
+            "failed": len(failed_updates)
+        }
+        
+        logger.info(f"Direct ADT update: {success_count}/{result['processed']} twins updated")
+        return result
+            
+    except Exception as e:
+        logger.error(f"Error updating Azure Digital Twins directly: {e}")
         return None
 
 
@@ -208,10 +299,28 @@ def read_root():
     return {
         "message": "Simulation API",
         "version": "0.1.0",
+        "azure_integration_enabled": ENABLE_AZURE_INTEGRATION,
         "endpoints": {
             "scenarios": "/scenarios",
             "simulation": "/simulations/run",
-            "templates": "/templates/platelet-pooling"
+            "templates": "/templates/platelet-pooling",
+            "azure_diagnostics": "/azure/diagnostics"
+        }
+    }
+
+
+@app.get("/azure/diagnostics")
+def azure_diagnostics():
+    """Diagnostic endpoint to check Azure integration configuration"""
+    return {
+        "azure_integration_enabled": ENABLE_AZURE_INTEGRATION,
+        "azure_function_endpoint_configured": bool(AZURE_FUNCTION_ENDPOINT),
+        "azure_function_key_configured": bool(AZURE_FUNCTION_KEY),
+        "device_id_mapping": DEVICE_ID_MAPPING,
+        "mapping_test": {
+            "centrifuge": map_device_id_to_twin("centrifuge"),
+            "platelet_separator": map_device_id_to_twin("platelet_separator"),
+            "pooling_station": map_device_id_to_twin("pooling_station")
         }
     }
 
@@ -530,7 +639,6 @@ def get_platelet_pooling_multi_batch_template(batches: int = 5, interval: int = 
     This template demonstrates capacity impacts by having multiple batches
     compete for device resources.
     """
-    from templates import get_multi_batch_template
     return get_multi_batch_template(num_batches=batches, batch_interval=interval)
 
 

@@ -8,7 +8,7 @@ import json
 import os
 from typing import Dict, Any
 import azure.functions as func
-from azure.identity import DefaultAzureCredential
+from azure.identity import ManagedIdentityCredential
 from azure.digitaltwins.core import DigitalTwinsClient
 
 
@@ -18,7 +18,7 @@ dt_client = None
 
 if ADT_ENDPOINT:
     try:
-        credential = DefaultAzureCredential()
+        credential = ManagedIdentityCredential()
         dt_client = DigitalTwinsClient(ADT_ENDPOINT, credential)
         logging.info(f"Connected to Azure Digital Twins: {ADT_ENDPOINT}")
     except Exception as e:
