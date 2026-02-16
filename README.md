@@ -5,6 +5,7 @@
 ## 🚀 Quick Start
 
 **New to this project?**
+- **[QUICK_ENV_SETUP.md](QUICK_ENV_SETUP.md)** - 3-step Azure integration setup (NEW!)
 - **[LINEAR_FLOW_SETUP.md](LINEAR_FLOW_SETUP.md)** - Complete setup guide for Azure Digital Twins integration
 - **[QUICK_START_GUIDE.md](docs/QUICK_START_GUIDE.md)** - Get running in 2 minutes
 - **[END_TO_END_GUIDE.md](docs/END_TO_END_GUIDE.md)** - Complete instructions for all features
