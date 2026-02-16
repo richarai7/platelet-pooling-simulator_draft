@@ -5,9 +5,9 @@
 All requirements from the issue have been successfully implemented:
 
 ### ✅ 1. Refactor Project Structure
-- Created `doc/` folder
-- Moved 19 `.md` files from root to `doc/`
-- Moved 2 `.txt` files from root to `doc/`
+- Created `docs/` folder
+- Moved 19 `.md` files from root to `docs/`
+- Moved 2 `.txt` files from root to `docs/`
 - Only `README.md` remains in root
 
 ### ✅ 2. Update Simulator Configuration
@@ -133,7 +133,7 @@ watch -n 2 "az dt twin show --dt-name platelet-dt-new --twin-id centrifuge | jq 
 
 ## 🔍 Verification Checklist
 
-- [ ] Documentation moved to `doc/` folder ✅
+- [ ] Documentation moved to `docs/` folder ✅
 - [ ] API running at http://localhost:8000 ✅
 - [ ] Azure Digital Twins instance created
 - [ ] DTDL models uploaded

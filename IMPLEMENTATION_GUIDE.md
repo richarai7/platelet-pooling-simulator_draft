@@ -7,9 +7,9 @@ This enhancement implements a complete refactoring of the platelet pooling simul
 ## 📋 Changes Made
 
 ### 1. Project Structure Refactoring ✅
-- Created `doc/` folder
-- Moved 19 markdown documentation files from root to `doc/`
-- Moved 2 text documentation files from root to `doc/`
+- Created `docs/` folder
+- Moved 19 markdown documentation files from root to `docs/`
+- Moved 2 text documentation files from root to `docs/`
 - Only `README.md` remains in root for GitHub visibility
 
 ### 2. Device Configuration Update ✅
@@ -279,7 +279,7 @@ platelet-pooling-simulator_draft/
 ├── platelet_pooling_config.json       # New device configuration (NEW)
 ├── test_end_to_end_flow.py           # Diagnostic tool (NEW)
 │
-├── doc/                               # Documentation folder (NEW)
+├── docs/                               # Documentation folder (NEW)
 │   ├── AZURE_SETUP_GUIDE.md          # Moved from root
 │   ├── QUICK_START_GUIDE.md          # Moved from root
 │   └── ... (17 other docs)

@@ -339,4 +339,4 @@ The new linear flow uses these 10 devices:
 - [Azure Digital Twins Documentation](https://docs.microsoft.com/azure/digital-twins/)
 - [DTDL Models](azure_integration/dtdl_models/)
 - [API Documentation](http://localhost:8000/docs)
-- [Setup Guide](doc/AZURE_SETUP_GUIDE.md)
+- [Setup Guide](docs/AZURE_SETUP_GUIDE.md)
