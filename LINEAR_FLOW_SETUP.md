@@ -59,7 +59,10 @@ az dt model list --dt-name $DT_INSTANCE
 
 ```bash
 # Set environment variable
-export AZURE_DIGITAL_TWINS_ENDPOINT="https://$DT_ENDPOINT"
+export DT_ENDPOINT="platelet-dt-instance-new.api.eus.digitaltwins.azure.net"
+export DT_INSTANCE="platelet-dt-instance-new"
+
+python azure_integration/scripts/create_linear_flow_twins.py --endpoint "https://$DT_ENDPOINT"
 
 # Create all 10 device twins and their relationships
 python azure_integration/scripts/create_linear_flow_twins.py \
