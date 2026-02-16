@@ -2,10 +2,12 @@ from typing import Dict, Any
 
 
 def get_platelet_template() -> Dict[str, Any]:
-    """Return complex platelet processing flow configuration template.
+    """Return linear platelet processing flow configuration template.
     
-    Based on the platelet flow diagram with pre-pooling, pooling, and final processing stages.
-    Includes 11 devices, 11 flows with dependencies, and 3 quality gates.
+    Based on the updated platelet flow with 10 devices in linear sequence:
+    Buffy Coat packs → Platelet washing → Centrifuge → Separator Macropress → 
+    Resting Trolly → Agitator → Macropress → Testing Agitator → Labeling → Release
+    
     Times are in seconds.
     """
     return {
@@ -16,193 +18,151 @@ def get_platelet_template() -> Dict[str, Any]:
         },
         
         "devices": [
-            # Pre-Processing Stage
+            # Stage 1: Initial Material
+            {
+                "id": "buffy_coat_packs",
+                "type": "material",
+                "capacity": 10,
+                "recovery_time_range": (60, 120)
+            },
+            # Stage 2: Washing
+            {
+                "id": "platelet_washing",
+                "type": "machine",
+                "capacity": 10,
+                "recovery_time_range": (180, 300)
+            },
+            # Stage 3: Centrifuge
             {
                 "id": "centrifuge",
                 "type": "machine",
-                "capacity": 10,  # Optimized for multi-batch support (5 batches × 2 flows each)
-                "recovery_time_range": (180, 300)  # 3-5 minutes
+                "capacity": 10,
+                "recovery_time_range": (180, 300)
             },
+            # Stage 4: Separator Macropress
             {
-                "id": "platelet_separator",
+                "id": "separator_macropress",
                 "type": "machine",
-                "capacity": 10,  # Optimized for multi-batch support
+                "capacity": 10,
+                "recovery_time_range": (120, 240)
+            },
+            # Stage 5: Resting
+            {
+                "id": "resting_trolly",
+                "type": "material",
+                "capacity": 15,
+                "recovery_time_range": (30, 60)
+            },
+            # Stage 6: Agitator
+            {
+                "id": "agitator",
+                "type": "machine",
+                "capacity": 10,
+                "recovery_time_range": (90, 150)
+            },
+            # Stage 7: Macropress
+            {
+                "id": "macropress",
+                "type": "machine",
+                "capacity": 10,
                 "recovery_time_range": (120, 180)
             },
-            
-            # Pooling Stage - Main Process
+            # Stage 8: Testing Agitator
             {
-                "id": "pooling_station",
-                "type": "workstation",
-                "capacity": 15,  # Optimized for multi-batch support (receives 2 flows per batch)
+                "id": "testing_agitator",
+                "type": "machine",
+                "capacity": 10,
                 "recovery_time_range": (60, 120)
             },
+            # Stage 9: Labeling
             {
-                "id": "weigh_register",
-                "type": "machine",
-                "capacity": 10,  # Optimized for multi-batch support
+                "id": "labeling",
+                "type": "workstation",
+                "capacity": 10,
                 "recovery_time_range": (30, 60)
             },
+            # Stage 10: Release
             {
-                "id": "sterile_connect",
+                "id": "release",
                 "type": "workstation",
-                "capacity": 10,  # Optimized for multi-batch support
-                "recovery_time_range": (45, 90)
-            },
-            
-            # Testing Stage
-            {
-                "id": "test_sample",
-                "type": "machine",
-                "capacity": 10,  # Optimized for multi-batch support
-                "recovery_time_range": (60, 90)
-            },
-            {
-                "id": "quality_check",
-                "type": "machine",
-                "capacity": 10,  # Optimized for multi-batch support
-                "recovery_time_range": (30, 60)
-            },
-            
-            # Storage and Labeling
-            {
-                "id": "label_station",
-                "type": "workstation",
-                "capacity": 10,  # Optimized for multi-batch support
+                "capacity": 10,
                 "recovery_time_range": (20, 40)
-            },
-            {
-                "id": "storage_unit",
-                "type": "material",
-                "capacity": 50,  # Can hold multiple units
-                "recovery_time_range": (10, 20)
-            },
-            
-            # Final Processing
-            {
-                "id": "final_inspection",
-                "type": "machine",
-                "capacity": 10,  # Optimized for multi-batch support
-                "recovery_time_range": (45, 75)
-            },
-            {
-                "id": "packaging_station",
-                "type": "workstation",
-                "capacity": 10,  # Optimized for multi-batch support
-                "recovery_time_range": (30, 60)
             }
         ],
         
         "flows": [
-            # Stage 1: Pre-Processing
+            # Linear flow through all 10 devices
             {
-                "flow_id": "f1_centrifuge_to_separator",
-                "from_device": "centrifuge",
-                "to_device": "platelet_separator",
-                "process_time_range": (300, 480),  # 5-8 minutes
+                "flow_id": "f1_buffy_to_washing",
+                "from_device": "buffy_coat_packs",
+                "to_device": "platelet_washing",
+                "process_time_range": (200, 300),
                 "priority": 1,
                 "dependencies": None
             },
-            
-            # Stage 2: Separation to Pooling
             {
-                "flow_id": "f2_separator_to_pooling",
-                "from_device": "platelet_separator",
-                "to_device": "pooling_station",
-                "process_time_range": (600, 900),  # 10-15 minutes
+                "flow_id": "f2_washing_to_centrifuge",
+                "from_device": "platelet_washing",
+                "to_device": "centrifuge",
+                "process_time_range": (300, 480),
                 "priority": 1,
-                "dependencies": ["f1_centrifuge_to_separator"]
+                "dependencies": ["f1_buffy_to_washing"]
             },
-            
-            # Stage 3: Pooling Process
             {
-                "flow_id": "f3_pooling_to_weigh",
-                "from_device": "pooling_station",
-                "to_device": "weigh_register",
-                "process_time_range": (420, 600),  # 7-10 minutes
-                "priority": 1,
-                "dependencies": ["f2_separator_to_pooling"]
-            },
-            
-            # Stage 4: Weight Registration to Sterile Connect
-            {
-                "flow_id": "f4_weigh_to_sterile",
-                "from_device": "weigh_register",
-                "to_device": "sterile_connect",
-                "process_time_range": (240, 360),  # 4-6 minutes
-                "priority": 1,
-                "dependencies": ["f3_pooling_to_weigh"]
-            },
-            
-            # Stage 5: Sterile Connect to Testing
-            {
-                "flow_id": "f5_sterile_to_test",
-                "from_device": "sterile_connect",
-                "to_device": "test_sample",
-                "process_time_range": (180, 300),  # 3-5 minutes
-                "priority": 1,
-                "dependencies": ["f4_weigh_to_sterile"]
-            },
-            
-            # Stage 6: Testing to Quality Check
-            {
-                "flow_id": "f6_test_to_qc",
-                "from_device": "test_sample",
-                "to_device": "quality_check",
-                "process_time_range": (360, 600),  # 6-10 minutes
-                "priority": 1,
-                "dependencies": ["f5_sterile_to_test"]
-            },
-            
-            # Stage 7: QC to Labeling (if pass)
-            {
-                "flow_id": "f7_qc_to_label",
-                "from_device": "quality_check",
-                "to_device": "label_station",
-                "process_time_range": (120, 240),  # 2-4 minutes
-                "priority": 1,
-                "dependencies": ["f6_test_to_qc"],
-                "required_gates": ["QC_Pass"]  # Only if QC passes
-            },
-            
-            # Stage 8: Labeling to Storage
-            {
-                "flow_id": "f8_label_to_storage",
-                "from_device": "label_station",
-                "to_device": "storage_unit",
-                "process_time_range": (60, 120),  # 1-2 minutes
-                "priority": 1,
-                "dependencies": ["f7_qc_to_label"]
-            },
-            
-            # Stage 9: Storage to Final Inspection
-            {
-                "flow_id": "f9_storage_to_inspection",
-                "from_device": "storage_unit",
-                "to_device": "final_inspection",
-                "process_time_range": (180, 300),  # 3-5 minutes
-                "priority": 1,
-                "dependencies": ["f8_label_to_storage"]
-            },
-            
-            # Stage 10: Final Inspection to Packaging
-            {
-                "flow_id": "f10_inspection_to_packaging",
-                "from_device": "final_inspection",
-                "to_device": "packaging_station",
-                "process_time_range": (240, 360),  # 4-6 minutes
-                "priority": 1,
-                "dependencies": ["f9_storage_to_inspection"]
-            },
-            
-            # Parallel flow: Direct pooling (if eligible)
-            {
-                "flow_id": "f11_direct_pool",
+                "flow_id": "f3_centrifuge_to_separator",
                 "from_device": "centrifuge",
-                "to_device": "pooling_station",
-                "process_time_range": (480, 720),  # 8-12 minutes (faster path)
-                "priority": 2,
-                "dependencies": None
+                "to_device": "separator_macropress",
+                "process_time_range": (400, 600),
+                "priority": 1,
+                "dependencies": ["f2_washing_to_centrifuge"]
+            },
+            {
+                "flow_id": "f4_separator_to_resting",
+                "from_device": "separator_macropress",
+                "to_device": "resting_trolly",
+                "process_time_range": (150, 250),
+                "priority": 1,
+                "dependencies": ["f3_centrifuge_to_separator"]
+            },
+            {
+                "flow_id": "f5_resting_to_agitator",
+                "from_device": "resting_trolly",
+                "to_device": "agitator",
+                "process_time_range": (300, 450),
+                "priority": 1,
+                "dependencies": ["f4_separator_to_resting"]
+            },
+            {
+                "flow_id": "f6_agitator_to_macropress",
+                "from_device": "agitator",
+                "to_device": "macropress",
+                "process_time_range": (200, 350),
+                "priority": 1,
+                "dependencies": ["f5_resting_to_agitator"]
+            },
+            {
+                "flow_id": "f7_macropress_to_testing",
+                "from_device": "macropress",
+                "to_device": "testing_agitator",
+                "process_time_range": (250, 400),
+                "priority": 1,
+                "dependencies": ["f6_agitator_to_macropress"]
+            },
+            {
+                "flow_id": "f8_testing_to_labeling",
+                "from_device": "testing_agitator",
+                "to_device": "labeling",
+                "process_time_range": (120, 200),
+                "priority": 1,
+                "dependencies": ["f7_macropress_to_testing"]
+            },
+            {
+                "flow_id": "f9_labeling_to_release",
+                "from_device": "labeling",
+                "to_device": "release",
+                "process_time_range": (100, 150),
+                "priority": 1,
+                "dependencies": ["f8_testing_to_labeling"]
             }
         ],
         
