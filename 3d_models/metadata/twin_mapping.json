@@ -1,0 +1,210 @@
+{
+  "version": "1.0",
+  "description": "Mapping between GLTF node names and Azure Digital Twin IDs for Platelet Pooling Lab",
+  "dtdl_version": "3",
+  "model_id": "dtmi:platelet:Device;1",
+  "mappings": [
+    {
+      "node_name": "buffy_coat_packs",
+      "twin_id": "buffy_coat_packs",
+      "device_type": "material",
+      "location": "Lab A - Station 1",
+      "description": "Initial blood product storage",
+      "capacity": 5,
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      }
+    },
+    {
+      "node_name": "platelet_washing",
+      "twin_id": "platelet_washing",
+      "device_type": "machine",
+      "location": "Lab A - Station 2",
+      "description": "Washing and preparation",
+      "capacity": 2,
+      "position": {
+        "x": 2,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      }
+    },
+    {
+      "node_name": "centrifuge",
+      "twin_id": "centrifuge",
+      "device_type": "machine",
+      "location": "Lab A - Station 3",
+      "description": "Separation by centrifugation",
+      "capacity": 2,
+      "position": {
+        "x": 4,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      }
+    },
+    {
+      "node_name": "separator_macropress",
+      "twin_id": "separator_macropress",
+      "device_type": "machine",
+      "location": "Lab B - Station 1",
+      "description": "Platelet separation",
+      "capacity": 2,
+      "position": {
+        "x": 6,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      }
+    },
+    {
+      "node_name": "resting_trolly",
+      "twin_id": "resting_trolly",
+      "device_type": "material",
+      "location": "Lab B - Station 2",
+      "description": "Temporary storage/resting",
+      "capacity": 10,
+      "position": {
+        "x": 8,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      }
+    },
+    {
+      "node_name": "agitator",
+      "twin_id": "agitator",
+      "device_type": "machine",
+      "location": "Lab B - Station 3",
+      "description": "Mixing and agitation",
+      "capacity": 3,
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 2
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      }
+    },
+    {
+      "node_name": "macropress",
+      "twin_id": "macropress",
+      "device_type": "machine",
+      "location": "Lab C - Station 1",
+      "description": "Final pressing",
+      "capacity": 2,
+      "position": {
+        "x": 2,
+        "y": 0,
+        "z": 2
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      }
+    },
+    {
+      "node_name": "testing_agitator",
+      "twin_id": "testing_agitator",
+      "device_type": "machine",
+      "location": "Lab C - Station 2",
+      "description": "Quality testing",
+      "capacity": 2,
+      "position": {
+        "x": 4,
+        "y": 0,
+        "z": 2
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      }
+    },
+    {
+      "node_name": "labeling",
+      "twin_id": "labeling",
+      "device_type": "workstation",
+      "location": "Lab C - Station 3",
+      "description": "Product labeling",
+      "capacity": 2,
+      "position": {
+        "x": 6,
+        "y": 0,
+        "z": 2
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      }
+    },
+    {
+      "node_name": "release",
+      "twin_id": "release",
+      "device_type": "workstation",
+      "location": "Lab D - Release Area",
+      "description": "Final release checkpoint",
+      "capacity": 5,
+      "position": {
+        "x": 8,
+        "y": 0,
+        "z": 2
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      }
+    }
+  ],
+  "linear_flow_sequence": [
+    "buffy_coat_packs",
+    "platelet_washing",
+    "centrifuge",
+    "separator_macropress",
+    "resting_trolly",
+    "agitator",
+    "macropress",
+    "testing_agitator",
+    "labeling",
+    "release"
+  ]
+}

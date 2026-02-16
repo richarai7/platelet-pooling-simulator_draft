@@ -37,7 +37,9 @@ LINEAR_FLOW_DEVICES = [
             "totalBlockedTime": 0.0,
             "totalIdleTime": 0.0,
             "totalProcessingTime": 0.0,
-            "location": "Lab A - Station 1"
+            "location": "Lab A - Station 1",
+            "position": {"x": 0, "y": 0, "z": 0},
+            "rotation": {"x": 0, "y": 0, "z": 0, "w": 1}
         }
     },
     {
@@ -55,7 +57,9 @@ LINEAR_FLOW_DEVICES = [
             "totalBlockedTime": 0.0,
             "totalIdleTime": 0.0,
             "totalProcessingTime": 0.0,
-            "location": "Lab A - Station 2"
+            "location": "Lab A - Station 2",
+            "position": {"x": 2, "y": 0, "z": 0},
+            "rotation": {"x": 0, "y": 0, "z": 0, "w": 1}
         }
     },
     {
@@ -73,7 +77,9 @@ LINEAR_FLOW_DEVICES = [
             "totalBlockedTime": 0.0,
             "totalIdleTime": 0.0,
             "totalProcessingTime": 0.0,
-            "location": "Lab A - Station 3"
+            "location": "Lab A - Station 3",
+            "position": {"x": 4, "y": 0, "z": 0},
+            "rotation": {"x": 0, "y": 0, "z": 0, "w": 1}
         }
     },
     {
@@ -91,7 +97,9 @@ LINEAR_FLOW_DEVICES = [
             "totalBlockedTime": 0.0,
             "totalIdleTime": 0.0,
             "totalProcessingTime": 0.0,
-            "location": "Lab B - Station 1"
+            "location": "Lab B - Station 1",
+            "position": {"x": 6, "y": 0, "z": 0},
+            "rotation": {"x": 0, "y": 0, "z": 0, "w": 1}
         }
     },
     {
@@ -109,7 +117,9 @@ LINEAR_FLOW_DEVICES = [
             "totalBlockedTime": 0.0,
             "totalIdleTime": 0.0,
             "totalProcessingTime": 0.0,
-            "location": "Lab B - Station 2"
+            "location": "Lab B - Station 2",
+            "position": {"x": 8, "y": 0, "z": 0},
+            "rotation": {"x": 0, "y": 0, "z": 0, "w": 1}
         }
     },
     {
@@ -127,7 +137,9 @@ LINEAR_FLOW_DEVICES = [
             "totalBlockedTime": 0.0,
             "totalIdleTime": 0.0,
             "totalProcessingTime": 0.0,
-            "location": "Lab B - Station 3"
+            "location": "Lab B - Station 3",
+            "position": {"x": 0, "y": 0, "z": 2},
+            "rotation": {"x": 0, "y": 0, "z": 0, "w": 1}
         }
     },
     {
@@ -145,7 +157,9 @@ LINEAR_FLOW_DEVICES = [
             "totalBlockedTime": 0.0,
             "totalIdleTime": 0.0,
             "totalProcessingTime": 0.0,
-            "location": "Lab C - Station 1"
+            "location": "Lab C - Station 1",
+            "position": {"x": 2, "y": 0, "z": 2},
+            "rotation": {"x": 0, "y": 0, "z": 0, "w": 1}
         }
     },
     {
@@ -163,7 +177,9 @@ LINEAR_FLOW_DEVICES = [
             "totalBlockedTime": 0.0,
             "totalIdleTime": 0.0,
             "totalProcessingTime": 0.0,
-            "location": "Lab C - Station 2"
+            "location": "Lab C - Station 2",
+            "position": {"x": 4, "y": 0, "z": 2},
+            "rotation": {"x": 0, "y": 0, "z": 0, "w": 1}
         }
     },
     {
@@ -181,7 +197,9 @@ LINEAR_FLOW_DEVICES = [
             "totalBlockedTime": 0.0,
             "totalIdleTime": 0.0,
             "totalProcessingTime": 0.0,
-            "location": "Lab C - Station 3"
+            "location": "Lab C - Station 3",
+            "position": {"x": 6, "y": 0, "z": 2},
+            "rotation": {"x": 0, "y": 0, "z": 0, "w": 1}
         }
     },
     {
@@ -199,7 +217,9 @@ LINEAR_FLOW_DEVICES = [
             "totalBlockedTime": 0.0,
             "totalIdleTime": 0.0,
             "totalProcessingTime": 0.0,
-            "location": "Lab D - Release Area"
+            "location": "Lab D - Release Area",
+            "position": {"x": 8, "y": 0, "z": 2},
+            "rotation": {"x": 0, "y": 0, "z": 0, "w": 1}
         }
     }
 ]
