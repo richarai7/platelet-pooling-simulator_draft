@@ -101,11 +101,11 @@ class TestResult:
         return self.failed == 0
 
 
-def test_api_health() -> Tuple[bool, str]:
+def test_api_health(api_url: str = API_BASE_URL) -> Tuple[bool, str]:
     """Test 1: API is running and responsive"""
     try:
         import requests
-        response = requests.get(f"{API_BASE_URL}/", timeout=5)
+        response = requests.get(f"{api_url}/", timeout=5)
         
         if response.status_code == 200:
             data = response.json()
@@ -116,11 +116,11 @@ def test_api_health() -> Tuple[bool, str]:
         return False, f"Connection failed: {str(e)}"
 
 
-def test_template_endpoint() -> Tuple[bool, str]:
+def test_template_endpoint(api_url: str = API_BASE_URL) -> Tuple[bool, str]:
     """Test 2: Template endpoint returns correct device configuration"""
     try:
         import requests
-        response = requests.get(f"{API_BASE_URL}/templates/platelet-pooling", timeout=5)
+        response = requests.get(f"{api_url}/templates/platelet-pooling", timeout=5)
         
         if response.status_code != 200:
             return False, f"HTTP {response.status_code}"
@@ -207,13 +207,13 @@ def test_azure_configuration() -> Tuple[bool, str]:
     return True, '\n'.join(config)
 
 
-def test_simulation_run() -> Tuple[bool, str]:
+def test_simulation_run(api_url: str = API_BASE_URL) -> Tuple[bool, str]:
     """Test 5: Run a minimal simulation"""
     try:
         import requests
         
         # Get template
-        template_response = requests.get(f"{API_BASE_URL}/templates/platelet-pooling", timeout=5)
+        template_response = requests.get(f"{api_url}/templates/platelet-pooling", timeout=5)
         if template_response.status_code != 200:
             return False, f"Failed to get template: HTTP {template_response.status_code}"
         
@@ -233,7 +233,7 @@ def test_simulation_run() -> Tuple[bool, str]:
         
         logger.info("   Running simulation (this may take a moment)...")
         response = requests.post(
-            f"{API_BASE_URL}/simulations/run",
+            f"{api_url}/simulations/run",
             json=payload,
             timeout=120
         )
@@ -277,14 +277,14 @@ def test_azure_update() -> Tuple[bool, str]:
 
 def main():
     parser = argparse.ArgumentParser(description='Smoke test for E2E Digital Twin flow')
-    parser.add_argument('--api-url', help='API base URL', default=API_BASE_URL)
+    parser.add_argument('--api-url', help='API base URL', default=None)
     parser.add_argument('--skip-simulation', action='store_true', help='Skip simulation test (faster)')
     parser.add_argument('--verbose', action='store_true', help='Verbose output')
     
     args = parser.parse_args()
     
-    global API_BASE_URL
-    API_BASE_URL = args.api_url
+    # Use command line arg if provided, otherwise use env variable default
+    api_url = args.api_url or API_BASE_URL
     
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
@@ -295,7 +295,7 @@ def main():
     logger.info("SMOKE TEST: End-to-End Digital Twin Flow")
     logger.info("=" * 80)
     logger.info("")
-    logger.info(f"API URL: {API_BASE_URL}")
+    logger.info(f"API URL: {api_url}")
     logger.info(f"Azure Integration: {'Enabled' if AZURE_ENABLED else 'Disabled'}")
     logger.info("")
     logger.info("=" * 80)
@@ -303,16 +303,16 @@ def main():
     
     results = TestResult()
     
-    # Run tests
+    # Run tests (pass api_url to tests that need it)
     tests = [
-        ("Test 1: API Health Check", test_api_health),
-        ("Test 2: Template Configuration", test_template_endpoint),
+        ("Test 1: API Health Check", lambda: test_api_health(api_url)),
+        ("Test 2: Template Configuration", lambda: test_template_endpoint(api_url)),
         ("Test 3: Device ID Mapping", test_device_mapping),
         ("Test 4: Azure Configuration", test_azure_configuration),
     ]
     
     if not args.skip_simulation:
-        tests.append(("Test 5: Simulation Execution", test_simulation_run))
+        tests.append(("Test 5: Simulation Execution", lambda: test_simulation_run(api_url)))
         tests.append(("Test 6: Azure Update Verification", test_azure_update))
     
     for name, test_func in tests:
