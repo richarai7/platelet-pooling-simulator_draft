@@ -6,8 +6,8 @@
 
 **New to this project?**
 - **[LINEAR_FLOW_SETUP.md](LINEAR_FLOW_SETUP.md)** - Complete setup guide for Azure Digital Twins integration
-- **[QUICK_START_GUIDE.md](doc/QUICK_START_GUIDE.md)** - Get running in 2 minutes
-- **[END_TO_END_GUIDE.md](doc/END_TO_END_GUIDE.md)** - Complete instructions for all features
+- **[QUICK_START_GUIDE.md](docs/QUICK_START_GUIDE.md)** - Get running in 2 minutes
+- **[END_TO_END_GUIDE.md](docs/END_TO_END_GUIDE.md)** - Complete instructions for all features
 
 ## 🩸 Platelet Pooling Linear Flow
 
