@@ -93,13 +93,28 @@ pip install -e ".[dev]"
 ./check_azure_integration.sh
 ```
 
-**To enable**:
+**To enable (Option 1: Using .env file)**:
+```bash
+# 1. Create .env file from template
+cp .env.example .env
+
+# 2. Edit .env with your Azure endpoints
+nano .env
+
+# 3. Load environment variables
+source load_env.sh
+
+# 4. Verify
+./check_azure_integration.sh
+```
+
+**To enable (Option 2: Direct export)**:
 ```bash
 export ENABLE_AZURE_INTEGRATION=true
 export AZURE_FUNCTION_ENDPOINT="https://your-function-app.azurewebsites.net/api/ProcessSimulationTelemetry"
 ```
 
-See **[WHY_AZURE_INTEGRATION_DISABLED.md](WHY_AZURE_INTEGRATION_DISABLED.md)** for complete details.
+See **[ENV_SETUP.md](ENV_SETUP.md)** for complete .env configuration guide or **[WHY_AZURE_INTEGRATION_DISABLED.md](WHY_AZURE_INTEGRATION_DISABLED.md)** for details.
 
 ## How to Run E2E Locally & in CI
 
