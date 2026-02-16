@@ -83,43 +83,65 @@ pip install azure-identity azure-digitaltwins-core azure-functions
 az login
 
 # Create resource group
-az group create --name platelet-rg --location eastus
+az group create --name platelet-rg-new --location eastus
 
 # Create Digital Twins instance
 az dt create \
-  --dt-name platelet-dt-instance \
-  --resource-group platelet-rg \
+  --dt-name platelet-dt-instance-new \
+  --resource-group platelet-rg-new \
   --location eastus
 
 # Get the endpoint
-az dt show --dt-name platelet-dt-instance --resource-group platelet-rg --query "hostName" -o tsv
+az dt show --dt-name platelet-dt-instance-new --resource-group platelet-rg-new --query "hostName" -o tsv
 ```
 
 ## Step 2: Upload DTDL Models
 
 ### Upload Models to Azure Digital Twins
 
+**First, grant yourself permissions:**
+
+```bash
+# Get your Azure account email
+USER_EMAIL=$(az account show --query user.name -o tsv)
+
+# Grant permissions (this may take 1-2 minutes to propagate)
+az dt role-assignment create \
+  --dt-name platelet-dt-instance-new \
+  --resource-group platelet-rg-new \
+  --assignee $USER_EMAIL \
+  --role "Azure Digital Twins Data Owner"
+```
+
+**Then upload the models:**
+
 ```bash
 # Set your instance name
-DT_INSTANCE="platelet-dt-instance"
+DT_INSTANCE="platelet-dt-instance-new"
+RESOURCE_GROUP="platelet-rg-new"
 
 # Upload Device model
 az dt model create \
   --dt-name $DT_INSTANCE \
+  --resource-group $RESOURCE_GROUP \
   --models azure_integration/dtdl_models/Device.json
 
 # Upload ProcessFlow model
 az dt model create \
   --dt-name $DT_INSTANCE \
+  --resource-group $RESOURCE_GROUP \
   --models azure_integration/dtdl_models/ProcessFlow.json
 
 # Upload Simulation model
 az dt model create \
   --dt-name $DT_INSTANCE \
+  --resource-group $RESOURCE_GROUP \
   --models azure_integration/dtdl_models/Simulation.json
 
 # Verify models uploaded
-az dt model list --dt-name $DT_INSTANCE
+az dt model list \
+  --dt-name $DT_INSTANCE \
+  --resource-group $RESOURCE_GROUP
 ```
 
 ### Create Initial Device Twins
@@ -164,12 +186,18 @@ az dt twin create \
 # centrifuge-02, separator-02, macopress-01, macopress-02, etc.
 ```
 
-Alternatively, use the provided script:
+Alternatively, use the provided script (creates all 12 devices automatically):
 
 ```bash
+# First, ensure Azure SDK is installed
+pip install azure-identity azure-digitaltwins-core
+
+# Get Digital Twins endpoint
+DT_ENDPOINT=$(az dt show --dt-name platelet-dt-instance-new --resource-group platelet-rg-new --query "hostName" -o tsv)
+
+# Create all device twins using default configuration
 python azure_integration/scripts/create_device_twins.py \
-  --endpoint "https://platelet-dt-instance.api.eus.digitaltwins.azure.net" \
-  --devices-config config/devices.json
+  --endpoint "https://$DT_ENDPOINT"
 ```
 
 ## Step 3: Deploy Azure Function App
@@ -179,20 +207,20 @@ python azure_integration/scripts/create_device_twins.py \
 ```bash
 # Create storage account (required for Functions)
 az storage account create \
-  --name plateletfuncstorage \
+  --name plateletfuncstoragenew \
   --location eastus \
-  --resource-group platelet-rg \
+  --resource-group platelet-rg-new \
   --sku Standard_LRS
 
 # Create Function App
 az functionapp create \
-  --resource-group platelet-rg \
+  --resource-group platelet-rg-new \
   --consumption-plan-location eastus \
   --runtime python \
-  --runtime-version 3.9 \
+  --runtime-version 3.11 \
   --functions-version 4 \
-  --name platelet-function-app \
-  --storage-account plateletfuncstorage \
+  --name platelet-function-app-new \
+  --storage-account plateletfuncstoragenew \
   --os-type Linux
 ```
 
@@ -200,12 +228,12 @@ az functionapp create \
 
 ```bash
 # Get Digital Twins endpoint
-DT_ENDPOINT=$(az dt show --dt-name $DT_INSTANCE --resource-group platelet-rg --query "hostName" -o tsv)
+DT_ENDPOINT=$(az dt show --dt-name $DT_INSTANCE --resource-group platelet-rg-new --query "hostName" -o tsv)
 
 # Set environment variable
 az functionapp config appsettings set \
-  --name platelet-function-app \
-  --resource-group platelet-rg \
+  --name platelet-function-app-new \
+  --resource-group platelet-rg-new \
   --settings AZURE_DIGITAL_TWINS_ENDPOINT="https://$DT_ENDPOINT"
 ```
 
@@ -214,13 +242,13 @@ az functionapp config appsettings set \
 ```bash
 # Enable managed identity
 az functionapp identity assign \
-  --name platelet-function-app \
-  --resource-group platelet-rg
+  --name platelet-function-app-new \
+  --resource-group platelet-rg-new
 
 # Get the principal ID
 PRINCIPAL_ID=$(az functionapp identity show \
-  --name platelet-function-app \
-  --resource-group platelet-rg \
+  --name platelet-function-app-new \
+  --resource-group platelet-rg-new \
   --query principalId -o tsv)
 
 # Grant Function App permissions to Digital Twins
@@ -237,12 +265,28 @@ az dt role-assignment create \
 cd azure_functions
 
 # Deploy to Azure
-func azure functionapp publish platelet-function-app
+
+npm install -g azure-functions-core-tools@4 --unsafe-perm true
+
+func azure functionapp publish platelet-function-app-new --python
+
+
+
+
+# 2nd Approach-
+cd /workspaces/platelet-pooling-simulator_draft/azure_functions
+
+zip -r function.zip . -x "*.pyc" -x "__pycache__/*"
+
+az functionapp deployment source config-zip \
+  --resource-group platelet-rg-new \
+  --name platelet-function-app-new \
+  --src function.zip
 
 # Verify deployment
 az functionapp function show \
-  --name platelet-function-app \
-  --resource-group platelet-rg \
+  --name platelet-function-app-new \
+  --resource-group platelet-rg-new \
   --function-name ProcessSimulationTelemetry
 ```
 
@@ -251,15 +295,15 @@ az functionapp function show \
 ```bash
 # Get function URL
 FUNCTION_URL=$(az functionapp function show \
-  --name platelet-function-app \
-  --resource-group platelet-rg \
+  --name platelet-function-app-new \
+  --resource-group platelet-rg-new \
   --function-name ProcessSimulationTelemetry \
   --query "invokeUrlTemplate" -o tsv)
 
 # Get function key
 FUNCTION_KEY=$(az functionapp keys list \
-  --name platelet-function-app \
-  --resource-group platelet-rg \
+  --name platelet-function-app-new \
+  --resource-group platelet-rg-new \
   --query "functionKeys.default" -o tsv)
 
 echo "Function Endpoint: $FUNCTION_URL"
@@ -332,8 +376,7 @@ python examples/test_azure_integration.py \
 # Run simulation via Function App
 python examples/test_azure_integration.py \
   --mode function \
-  --function-url $AZURE_FUNCTION_ENDPOINT \
-  --function-key $AZURE_FUNCTION_KEY
+  --endpoint "$AZURE_FUNCTION_ENDPOINT?code=$AZURE_FUNCTION_KEY"
 
 # Expected output:
 # ✓ Connected to Function App
@@ -360,14 +403,14 @@ python examples/test_azure_integration.py \
 # Create SignalR Service
 az signalr create \
   --name platelet-signalr \
-  --resource-group platelet-rg \
+  --resource-group platelet-rg-new \
   --sku Free_F1 \
   --location eastus
 
 # Get connection string
 az signalr key list \
   --name platelet-signalr \
-  --resource-group platelet-rg \
+  --resource-group platelet-rg-new \
   --query primaryConnectionString -o tsv
 ```
 
@@ -403,7 +446,7 @@ npm run dev
 # Create ADX cluster
 az kusto cluster create \
   --cluster-name plateletadx \
-  --resource-group platelet-rg \
+  --resource-group platelet-rg-new \
   --location eastus \
   --sku name="Dev(No SLA)_Standard_E2a_v4" tier="Basic"
 
@@ -411,7 +454,7 @@ az kusto cluster create \
 az kusto database create \
   --cluster-name plateletadx \
   --database-name SimulationHistory \
-  --resource-group platelet-rg \
+  --resource-group platelet-rg-new \
   --read-write-database soft-delete-period=P365D hot-cache-period=P31D
 ```
 
@@ -426,7 +469,7 @@ az dt data-history connection create adx \
   --adx-database-name SimulationHistory \
   --adx-property-events-table DevicePropertyChanges \
   --adx-twin-lifecycle-events-table TwinLifecycleEvents \
-  --resource-group platelet-rg
+  --resource-group platelet-rg-new
 ```
 
 ### Query Historical Data
@@ -458,18 +501,53 @@ DevicePropertyChanges
 
 ### Issue: Function App Returns 500
 
+**Common Causes:**
+1. Missing or incorrect AZURE_DIGITAL_TWINS_ENDPOINT environment variable
+2. Managed Identity not properly configured
+3. Role assignment not propagated
+4. Cold start timeout issues
+5. Python runtime/dependency issues
+
 **Solution:**
 ```bash
-# Check function logs
-az functionapp log tail \
-  --name platelet-function-app \
-  --resource-group platelet-rg
-
-# Verify environment variables
+# 1. Verify environment variable is set
 az functionapp config appsettings list \
   --name platelet-function-app \
-  --resource-group platelet-rg
+  --resource-group platelet-rg-new \
+  | grep AZURE_DIGITAL_TWINS_ENDPOINT
+
+# 2. Verify managed identity is enabled
+az functionapp identity show \
+  --name platelet-function-app \
+  --resource-group platelet-rg-new
+
+# 3. Re-grant permissions (wait 2-3 minutes for propagation)
+PRINCIPAL_ID=$(az functionapp identity show \
+  --name platelet-function-app \
+  --resource-group platelet-rg-new \
+  --query principalId -o tsv)
+
+az dt role-assignment create \
+  --dt-name platelet-dt-instance-new \
+  --assignee $PRINCIPAL_ID \
+  --role "Azure Digital Twins Data Owner"
+
+# 4. Restart function app
+az functionapp restart \
+  --name platelet-function-app \
+  --resource-group platelet-rg-new
+
+# 5. Redeploy function code
+cd azure_functions
+rm -f function.zip
+zip -r function.zip . -x "*.pyc" -x "__pycache__/*" -x ".python_packages/*"
+az functionapp deployment source config-zip \
+  --resource-group platelet-rg-new \
+  --name platelet-function-app \
+  --src function.zip
 ```
+
+**Note:** The API includes automatic fallback - if the Azure Function fails, it will use direct Azure Digital Twins connection instead. This ensures your simulations always update twins successfully even if the function has issues.
 
 ### Issue: Permission Denied on Digital Twins
 
@@ -542,7 +620,7 @@ When running accelerated simulations (36 hours in < 2 minutes):
    ```bash
    az functionapp plan create \
      --name premium-plan \
-     --resource-group platelet-rg \
+     --resource-group platelet-rg-new \
      --sku EP1 \
      --location eastus
    ```
@@ -552,7 +630,7 @@ When running accelerated simulations (36 hours in < 2 minutes):
    # For very high throughput
    az eventhubs namespace create \
      --name platelet-events \
-     --resource-group platelet-rg \
+     --resource-group platelet-rg-new \
      --location eastus
    ```
 

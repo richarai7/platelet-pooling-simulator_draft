@@ -161,20 +161,19 @@ class SimulationADTRunner:
                     "startTime": datetime.now(timezone.utc).isoformat(),
                     "simulationStatus": "Initializing",
                     "totalFlowsCompleted": 0,
-                    "totalEvents": 0,
-                    "executionMode": self.config.get('simulation', {}).get('execution_mode', 'accelerated'),
-                    "speedMultiplier": self.config.get('simulation', {}).get('speed_multiplier', 1.0)
+                    "totalEvents": 0
                 }
             )
             
             # Update to Running status
-            if self.stream_telemetry:
-                await self.streamer.stream_simulation_update(
-                    simulation_id=self.simulation_id,
-                    simulation_status="Running",
-                    total_flows_completed=0,
-                    total_events=0
-                )
+            await self.dt_client.update_twin_properties(
+                twin_id=self.simulation_id,
+                properties={
+                    "simulationStatus": "Running",
+                    "totalFlowsCompleted": 0,
+                    "totalEvents": 0
+                }
+            )
             
             # Initialize simulation engine
             logger.info("\n2. Initializing simulation engine...")
@@ -213,17 +212,20 @@ class SimulationADTRunner:
                 await self._stream_final_states(result)
             
             # Update simulation twin to Completed
-            if self.stream_telemetry:
-                await self.streamer.stream_simulation_update(
-                    simulation_id=self.simulation_id,
-                    simulation_status="Completed",
-                    total_flows_completed=result['summary']['total_flows_completed'],
-                    total_events=result['summary']['total_events'],
-                    additional_properties={
-                        "endTime": datetime.now(timezone.utc).isoformat(),
-                        "executionTimeSeconds": result['summary']['execution_time_seconds']
-                    }
-                )
+            await self.dt_client.update_twin_properties(
+                twin_id=self.simulation_id,
+                properties={
+                    "simulationStatus": "Completed",
+                    "totalFlowsCompleted": result['summary']['total_flows_completed'],
+                    "totalEvents": result['summary']['total_events'],
+                    "endTime": datetime.now(timezone.utc).isoformat(),
+                    "simulationTimeSeconds": result['summary']['simulation_time_seconds'],
+                    "executionTimeSeconds": result['summary']['execution_time_seconds']
+                }
+            )
+            
+            # Flush any remaining updates to ensure all batched updates are sent before completing the simulation
+            await self.dt_client.flush_updates()
             
             logger.info("\n" + "=" * 80)
             logger.info("✅ SIMULATION AND SYNC COMPLETE!")
@@ -240,8 +242,9 @@ class SimulationADTRunner:
     async def _stream_final_states(self, result: Dict[str, Any]):
         """Stream final device states to Azure Digital Twins"""
         
-        # Get state history if available
-        state_history_all = result.get('state_history', [])
+        # Get event timeline to calculate metrics
+        event_timeline = result.get('event_timeline', [])
+        simulation_time = result['summary']['simulation_time_seconds']
         
         for device in result.get('device_states', []):
             device_id = device['device_id']
@@ -253,20 +256,59 @@ class SimulationADTRunner:
             )
             capacity = device_config.get('capacity', 1) if device_config else 1
             
-            # Calculate time-in-state metrics from state history
-            device_history = [h for h in state_history_all if h.get('device_id') == device_id]
-            total_idle = sum(h.get('duration', 0) for h in device_history if h.get('state') == 'Idle')
-            total_processing = sum(h.get('duration', 0) for h in device_history if h.get('state') == 'Processing')
-            total_blocked = sum(h.get('duration', 0) for h in device_history if h.get('state') == 'Blocked')
+            # Calculate time-in-state metrics from event timeline
+            device_events = [e for e in event_timeline if e.get('device_id') == device_id]
             
-            await self.streamer.stream_device_update(
-                device_id=device_id,
-                status=device['final_state'],
-                in_use=0,  # Final state, nothing in use
-                capacity=capacity,
-                queue_length=0,
-                additional_properties={
-                    "totalProcessed": 0,  # Would need to be tracked in engine
+            # Track state durations
+            total_idle = 0.0
+            total_processing = 0.0
+            total_blocked = 0.0
+            total_processed = 0  # Count of COMPLETE_PROCESSING events
+            
+            # Calculate durations from state transitions
+            current_state = 'Idle'  # Devices start in Idle state
+            last_timestamp = 0.0  # Simulation starts at time 0.0
+            
+            for event in device_events:
+                # Calculate duration in previous state
+                duration = event['timestamp'] - last_timestamp
+                
+                if current_state == 'Idle':
+                    total_idle += duration
+                elif current_state == 'Processing':
+                    total_processing += duration
+                elif current_state == 'Blocked':
+                    total_blocked += duration
+                
+                # Count completed processing
+                if event['event'] == 'COMPLETE_PROCESSING':
+                    total_processed += 1
+                
+                # Update current state
+                current_state = event['to_state']
+                last_timestamp = event['timestamp']
+            
+            # Add final state duration (from last event to end of simulation)
+            if device_events:
+                final_duration = simulation_time - last_timestamp
+                if current_state == 'Idle':
+                    total_idle += final_duration
+                elif current_state == 'Processing':
+                    total_processing += final_duration
+                elif current_state == 'Blocked':
+                    total_blocked += final_duration
+            else:
+                # No events means device was idle the entire time
+                total_idle = simulation_time
+            
+            # Update twin properties directly
+            await self.dt_client.update_twin_properties(
+                twin_id=device_id,
+                properties={
+                    "status": device['final_state'],
+                    "inUse": 0,  # Final state, nothing in use
+                    "queueLength": 0,
+                    "totalProcessed": total_processed,
                     "totalIdleTime": total_idle,
                     "totalProcessingTime": total_processing,
                     "totalBlockedTime": total_blocked

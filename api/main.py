@@ -2,10 +2,12 @@ import sys
 import json
 import sqlite3
 import logging
+import os
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+import httpx
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -24,7 +26,7 @@ from .models import (
     SimulationRunRequest,
     SimulationResultsResponse
 )
-from .templates import get_platelet_template
+from .templates import get_platelet_template, get_multi_batch_template
 
 # Add parent directory for capacity_multiplier
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -54,6 +56,242 @@ results_repo = ResultsRepository(db_path="scenarios.db")
 # Active simulations tracking: {simulation_id: engine_instance}
 active_simulations: Dict[str, SimulationEngine] = {}
 
+# Azure Function configuration
+AZURE_FUNCTION_ENDPOINT = os.getenv('AZURE_FUNCTION_ENDPOINT')
+AZURE_FUNCTION_KEY = os.getenv('AZURE_FUNCTION_KEY')
+ENABLE_AZURE_INTEGRATION = os.getenv('ENABLE_AZURE_INTEGRATION', 'false').lower() == 'true'
+
+# Device ID mapping: simulation -> Azure Digital Twins
+DEVICE_ID_MAPPING = {
+    "centrifuge": "centrifuge",
+    "platelet_separator": "platelet_separator",
+    "pooling_station": "pooling_station",
+    "weigh_register": "weigh_register",
+    "sterile_connect": "sterile_connect",
+    "test_sample": "test_sample",
+    "quality_check": "quality_check",
+    "label_station": "label_station",
+    "storage_unit": "storage_unit",
+    "final_inspection": "final_inspection",
+    "packaging_station": "packaging_station"
+}
+
+
+def map_device_id_to_twin(device_id: str) -> str:
+    """Map simulation device ID to Azure Digital Twin ID"""
+    return DEVICE_ID_MAPPING.get(device_id, device_id)
+
+
+def prepare_telemetry_from_results(results: Dict[str, Any], simulation_id: str) -> Dict[str, Any]:
+    """
+    Prepare telemetry payload from simulation results for Azure Function
+    
+    Args:
+        results: Simulation results dictionary
+        simulation_id: Unique simulation identifier
+    
+    Returns:
+        Telemetry payload in format expected by Azure Function
+    """
+    telemetry_batch = []
+    
+    # Add simulation twin telemetry
+    simulation_telemetry = {
+        "twin_id": simulation_id,
+        "properties": {
+            "simulationId": simulation_id,
+            "simulationStatus": "Completed",
+            "totalFlowsCompleted": results.get('summary', {}).get('total_flows_completed', 0),
+            "totalEvents": results.get('summary', {}).get('total_events', 0),
+            "simulationTimeSeconds": results.get('summary', {}).get('simulation_time_seconds', 0),
+            "executionTimeSeconds": results.get('summary', {}).get('execution_time_seconds', 0)
+        }
+    }
+    telemetry_batch.append(simulation_telemetry)
+    
+    # Add device telemetry from final states
+    device_states = results.get('device_states', [])
+    event_timeline = results.get('event_timeline', [])
+    simulation_time = results.get('summary', {}).get('simulation_time_seconds', 0)
+    
+    for device in device_states:
+        device_id = device.get('device_id')
+        if not device_id:
+            continue
+        
+        # Map simulation device ID to Azure Digital Twin ID
+        twin_id = map_device_id_to_twin(device_id)
+        
+        # Calculate metrics from event timeline (similar to run_simulation_with_adt.py)
+        device_events = [e for e in event_timeline if e.get('device_id') == device_id]
+        
+        total_idle = 0.0
+        total_processing = 0.0
+        total_blocked = 0.0
+        total_processed = 0
+        
+        current_state = 'Idle'
+        last_timestamp = 0.0
+        
+        for event in device_events:
+            duration = event['timestamp'] - last_timestamp
+            
+            if current_state == 'Idle':
+                total_idle += duration
+            elif current_state == 'Processing':
+                total_processing += duration
+            elif current_state == 'Blocked':
+                total_blocked += duration
+            
+            if event['event'] == 'COMPLETE_PROCESSING':
+                total_processed += 1
+            
+            current_state = event['to_state']
+            last_timestamp = event['timestamp']
+        
+        # Add final state duration
+        if device_events:
+            final_duration = simulation_time - last_timestamp
+            if current_state == 'Idle':
+                total_idle += final_duration
+            elif current_state == 'Processing':
+                total_processing += final_duration
+            elif current_state == 'Blocked':
+                total_blocked += final_duration
+        else:
+            total_idle = simulation_time
+        
+        device_telemetry = {
+            "twin_id": twin_id,  # Use mapped Azure Digital Twin ID
+            "properties": {
+                "status": device.get('final_state', 'Idle'),
+                "inUse": 0,
+                "queueLength": 0,
+                "totalProcessed": total_processed,
+                "totalIdleTime": total_idle,
+                "totalProcessingTime": total_processing,
+                "totalBlockedTime": total_blocked
+            }
+        }
+        telemetry_batch.append(device_telemetry)
+    
+    return {"telemetry": telemetry_batch}
+
+
+async def send_telemetry_to_azure_function(telemetry: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    Send telemetry to Azure Function for Digital Twins update
+    
+    Args:
+        telemetry: Telemetry payload
+    
+    Returns:
+        Response from Azure Function or None if disabled/failed
+    """
+    if not ENABLE_AZURE_INTEGRATION:
+        logger.debug("Azure integration is disabled")
+        return None
+    
+    if not AZURE_FUNCTION_ENDPOINT:
+        logger.warning("Azure Function endpoint not configured - using direct Azure Digital Twins connection")
+        # Fallback to direct ADT connection
+        return await send_telemetry_direct_to_adt(telemetry)
+    
+    # Log telemetry being sent
+    twin_ids = [t.get('twin_id') for t in telemetry.get('telemetry', [])]
+    logger.info(f"Sending telemetry for {len(twin_ids)} twins to Azure Function...")
+    
+    try:
+        # Build request URL with function key if provided
+        url = AZURE_FUNCTION_ENDPOINT
+        headers = {"Content-Type": "application/json"}
+        
+        if AZURE_FUNCTION_KEY:
+            # Add function key as query parameter
+            url = f"{url}?code={AZURE_FUNCTION_KEY}"
+        
+        # Send telemetry to Azure Function
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(url, json=telemetry, headers=headers)
+            response.raise_for_status()
+            
+            result = response.json()
+            logger.info(f"Azure Function response: {result.get('success', 0)}/{result.get('processed', 0)} twins updated")
+            return result
+            
+    except httpx.HTTPStatusError as e:
+        logger.error(f"Azure Function HTTP error: {e.response.status_code} - falling back to direct ADT")
+        # Fallback to direct connection
+        return await send_telemetry_direct_to_adt(telemetry)
+    except httpx.TimeoutException:
+        logger.error("Azure Function request timed out - falling back to direct ADT")
+        return await send_telemetry_direct_to_adt(telemetry)
+    except Exception as e:
+        logger.error(f"Error sending telemetry to Azure Function: {e} - falling back to direct ADT")
+        return await send_telemetry_direct_to_adt(telemetry)
+
+
+async def send_telemetry_direct_to_adt(telemetry: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    Send telemetry directly to Azure Digital Twins (fallback method)
+    
+    Args:
+        telemetry: Telemetry payload
+    
+    Returns:
+        Response with update status or None if failed
+    """
+    try:
+        from azure.identity import DefaultAzureCredential
+        from azure.digitaltwins.core import DigitalTwinsClient
+        
+        # Connect to Azure Digital Twins
+        adt_endpoint = os.getenv('AZURE_DIGITAL_TWINS_ENDPOINT', 'https://platelet-dt-instance-new.api.eus.digitaltwins.azure.net')
+        credential = DefaultAzureCredential()
+        dt_client = DigitalTwinsClient(adt_endpoint, credential)
+        
+        success_count = 0
+        failed_updates = []
+        
+        for update in telemetry.get('telemetry', []):
+            twin_id = update.get('twin_id')
+            properties = update.get('properties', {})
+            
+            if not twin_id:
+                continue
+            
+            try:
+                # Create JSON patch for update
+                patch = []
+                for key, value in properties.items():
+                    patch.append({
+                        "op": "replace",
+                        "path": f"/{key}",
+                        "value": value
+                    })
+                
+                # Update twin
+                dt_client.update_digital_twin(twin_id, patch)
+                success_count += 1
+                logger.debug(f"Updated twin {twin_id} (direct)")
+                
+            except Exception as e:
+                logger.error(f"Failed to update twin {twin_id}: {e}")
+                failed_updates.append({"twin_id": twin_id, "error": str(e)})
+        
+        result = {
+            "processed": len(telemetry.get('telemetry', [])),
+            "success": success_count,
+            "failed": len(failed_updates)
+        }
+        
+        logger.info(f"Direct ADT update: {success_count}/{result['processed']} twins updated")
+        return result
+            
+    except Exception as e:
+        logger.error(f"Error updating Azure Digital Twins directly: {e}")
+        return None
+
 
 @app.get("/")
 def read_root():
@@ -61,10 +299,28 @@ def read_root():
     return {
         "message": "Simulation API",
         "version": "0.1.0",
+        "azure_integration_enabled": ENABLE_AZURE_INTEGRATION,
         "endpoints": {
             "scenarios": "/scenarios",
             "simulation": "/simulations/run",
-            "templates": "/templates/platelet-pooling"
+            "templates": "/templates/platelet-pooling",
+            "azure_diagnostics": "/azure/diagnostics"
+        }
+    }
+
+
+@app.get("/azure/diagnostics")
+def azure_diagnostics():
+    """Diagnostic endpoint to check Azure integration configuration"""
+    return {
+        "azure_integration_enabled": ENABLE_AZURE_INTEGRATION,
+        "azure_function_endpoint_configured": bool(AZURE_FUNCTION_ENDPOINT),
+        "azure_function_key_configured": bool(AZURE_FUNCTION_KEY),
+        "device_id_mapping": DEVICE_ID_MAPPING,
+        "mapping_test": {
+            "centrifuge": map_device_id_to_twin("centrifuge"),
+            "platelet_separator": map_device_id_to_twin("platelet_separator"),
+            "pooling_station": map_device_id_to_twin("pooling_station")
         }
     }
 
@@ -259,7 +515,7 @@ def delete_scenario(scenario_id: int):
 
 
 @app.post("/simulations/run", response_model=SimulationResultsResponse)
-def run_simulation(request: SimulationRunRequest):
+async def run_simulation(request: SimulationRunRequest):
     """Run a simulation with the provided configuration"""
     try:
         # Initialize and run simulation engine
@@ -325,6 +581,23 @@ def run_simulation(request: SimulationRunRequest):
             except Exception as db_error:
                 logger.warning(f"Failed to save to database: {db_error}")
             
+            # Send telemetry to Azure Function for Digital Twins update
+            azure_response = None
+            if ENABLE_AZURE_INTEGRATION:
+                try:
+                    telemetry = prepare_telemetry_from_results(results, sim_id)
+                    azure_response = await send_telemetry_to_azure_function(telemetry)
+                    
+                    if azure_response:
+                        logger.info(f"Digital Twins updated: {azure_response.get('success', 0)} twins")
+                        results['metadata']['azure_twins_updated'] = azure_response.get('success', 0)
+                    else:
+                        logger.warning("Azure Function call did not return a response")
+                except Exception as azure_error:
+                    logger.error(f"Error updating Digital Twins: {azure_error}")
+                    # Don't fail the simulation if Azure update fails
+                    results['metadata']['azure_error'] = str(azure_error)
+            
             return SimulationResultsResponse(
                 results=results,
                 json_export_path=json_export_path,
@@ -366,7 +639,6 @@ def get_platelet_pooling_multi_batch_template(batches: int = 5, interval: int = 
     This template demonstrates capacity impacts by having multiple batches
     compete for device resources.
     """
-    from templates import get_multi_batch_template
     return get_multi_batch_template(num_batches=batches, batch_interval=interval)
 
 
