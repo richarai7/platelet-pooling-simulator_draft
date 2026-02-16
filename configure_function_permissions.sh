@@ -149,7 +149,12 @@ fi
 TWIN_COUNT=$(az dt twin query \
   --dt-name $DT_INSTANCE \
   --query-command 'SELECT COUNT() FROM DIGITALTWINS' \
-  --query 'result[0].$count' -o tsv 2>/dev/null || echo "0")
+  --query 'result[0].$count' -o tsv 2>/tmp/az_twin_query_error.log)
+
+if [ $? -ne 0 ]; then
+    echo -e "   ${YELLOW}⚠${NC}  Unable to query twins (check /tmp/az_twin_query_error.log)"
+    TWIN_COUNT="unknown"
+fi
 
 echo "   Twins in ADT: $TWIN_COUNT"
 

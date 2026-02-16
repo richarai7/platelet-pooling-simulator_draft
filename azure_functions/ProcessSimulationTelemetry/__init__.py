@@ -101,10 +101,10 @@ def update_twin_with_retry(twin_id: str, properties: Dict[str, Any]) -> Tuple[bo
                 logging.error(f"❌ {error_msg}: {str(e)}")
                 # Safely get response text
                 try:
-                    response_text = e.response.text() if hasattr(e, 'response') and hasattr(e.response, 'text') else 'N/A'
+                    response_text = e.response.text() if hasattr(e, 'response') and hasattr(e.response, 'text') else 'Response text unavailable'
                     logging.error(f"   Response: {response_text}")
                 except Exception:
-                    logging.error(f"   Response: Unable to retrieve response text")
+                    logging.error(f"   Response: Response text unavailable")
                 return False, error_msg
             
             # Retry on 5xx errors and 429

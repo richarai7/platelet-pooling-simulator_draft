@@ -44,6 +44,10 @@ def parse_bool_env(value: str, default: bool = False) -> bool:
 API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost:8000')
 AZURE_ENABLED = parse_bool_env(os.getenv('ENABLE_AZURE_INTEGRATION', 'false'))
 
+# Test data constants
+SMOKE_TEST_RUN_NAME = "Smoke Test"
+SMOKE_TEST_SIMULATION_NAME = "E2E Validation"
+
 # Expected device names (10 devices in linear flow)
 EXPECTED_DEVICES = [
     "buffy_coat_packs",
@@ -165,8 +169,9 @@ def test_device_mapping() -> Tuple[bool, str]:
             if device not in DEVICE_ID_MAPPING:
                 missing.append(device)
             elif DEVICE_ID_MAPPING[device] != device:
-                # Mapping should be device_id -> device_id (identity mapping)
-                missing.append(f"{device} maps to {DEVICE_ID_MAPPING[device]} (should be {device})")
+                # NOTE: Current implementation expects identity mapping (device_id -> device_id)
+                # If transformations are needed in the future, update this validation logic
+                missing.append(f"{device} maps to {DEVICE_ID_MAPPING[device]} (expected {device})")
         
         if missing:
             return False, f"Mapping issues: {', '.join(missing)}"
@@ -226,8 +231,8 @@ def test_simulation_run(api_url: str = API_BASE_URL) -> Tuple[bool, str]:
         # Run simulation
         payload = {
             "config": template,
-            "run_name": "Smoke Test",
-            "simulation_name": "E2E Validation",
+            "run_name": SMOKE_TEST_RUN_NAME,
+            "simulation_name": SMOKE_TEST_SIMULATION_NAME,
             "export_to_json": False
         }
         
