@@ -92,6 +92,8 @@ def prepare_telemetry_from_results(results: Dict[str, Any], simulation_id: str) 
     Returns:
         Telemetry payload in format expected by Azure Function
     """
+    from datetime import datetime, timezone
+
     telemetry_batch = []
 
     # Add simulation twin telemetry
@@ -113,6 +115,10 @@ def prepare_telemetry_from_results(results: Dict[str, Any], simulation_id: str) 
     event_timeline = results.get('event_timeline', [])
     simulation_time = results.get('summary', {}).get('simulation_time_seconds', 0)
 
+    # Get device configs from results metadata if available
+    config_from_results = results.get('metadata', {}).get('config', {})
+    device_configs = {d['id']: d for d in config_from_results.get('devices', [])}
+
     logger.info(f"Preparing telemetry: {len(device_states)} devices, {len(event_timeline)} events, sim_time={simulation_time}")
 
     for device in device_states:
@@ -122,6 +128,9 @@ def prepare_telemetry_from_results(results: Dict[str, Any], simulation_id: str) 
 
         # Map simulation device ID to Azure Digital Twin ID
         twin_id = map_device_id_to_twin(device_id)
+
+        # Get device configuration
+        device_config = device_configs.get(device_id, {})
 
         # Calculate metrics from event timeline (similar to run_simulation_with_adt.py)
         device_events = [e for e in event_timeline if e.get('device_id') == device_id]
@@ -164,18 +173,53 @@ def prepare_telemetry_from_results(results: Dict[str, Any], simulation_id: str) 
 
         logger.debug(f"Device {device_id}: processed={total_processed}, idle={total_idle:.2f}s, processing={total_processing:.2f}s, blocked={total_blocked:.2f}s")
 
+        # Calculate utilization rate
+        capacity = device_config.get('capacity', 1)
+        utilization_rate = 0.0
+        if simulation_time > 0:
+            # Utilization = (processing time / total time) * 100
+            utilization_rate = (total_processing / simulation_time) * 100.0
+
+        # Get device metadata
+        metadata = device_config.get('metadata', {})
+        device_type = device_config.get('type', metadata.get('deviceType', 'unknown'))
+        location = metadata.get('location', 'Unknown')
+
+        # Prepare all properties to match DTDL Device model
         device_telemetry = {
             "twin_id": twin_id,  # Use mapped Azure Digital Twin ID
             "properties": {
+                # Core device properties
+                "deviceId": device_id,
+                "deviceType": device_type,
                 "status": device.get('final_state', 'Idle'),
-                "inUse": 0,
-                "queueLength": 0,
+                "capacity": capacity,
+                "inUse": 0,  # Final state, nothing in use
+                "utilizationRate": round(utilization_rate, 2),
+                "queueLength": 0,  # Final state, queue is empty
+
+                # KPI metrics
                 "totalProcessed": total_processed,
-                "totalIdleTime": total_idle,
-                "totalProcessingTime": total_processing,
-                "totalBlockedTime": total_blocked
+                "totalIdleTime": round(total_idle, 2),
+                "totalProcessingTime": round(total_processing, 2),
+                "totalBlockedTime": round(total_blocked, 2),
+
+                # Location and metadata
+                "location": location,
+
+                # Timestamp
+                "lastUpdateTime": datetime.now(timezone.utc).isoformat()
             }
         }
+
+        # Add position if available (for 3D visualization)
+        if 'position' in metadata:
+            device_telemetry["properties"]["position"] = metadata['position']
+
+        # Add rotation if available (for 3D visualization)
+        if 'rotation' in metadata:
+            device_telemetry["properties"]["rotation"] = metadata['rotation']
+
         telemetry_batch.append(device_telemetry)
 
     return {"telemetry": telemetry_batch}
