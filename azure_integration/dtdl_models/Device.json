@@ -199,6 +199,12 @@
         ]
       },
       "description": "Event emitted when a processing step completes"
+    },
+    {
+      "@type": "Relationship",
+      "name": "feedsInto",
+      "target": "dtmi:platelet:Device;1",
+      "description": "Relationship to the next device in the processing flow"
     }
   ]
 }
