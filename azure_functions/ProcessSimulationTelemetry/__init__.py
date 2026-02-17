@@ -260,17 +260,18 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 def create_json_patch(properties: Dict[str, Any]) -> list:
     """
     Create JSON Patch document for Digital Twin property updates
-    
+
     Args:
         properties: Dictionary of properties to update
-        
+
     Returns:
         List of JSON Patch operations
     """
+    # Use 'add' operation which works for both new and existing properties
     patch = []
     for key, value in properties.items():
         patch.append({
-            "op": "replace",
+            "op": "add",
             "path": f"/{key}",
             "value": value
         })

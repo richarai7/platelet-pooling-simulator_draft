@@ -1,38 +1,35 @@
-# Why is Azure Integration Disabled?
+# Azure Integration Configuration
 
 ## Quick Answer
 
-**Azure integration is disabled by default for local development and testing.**
+**Azure integration is enabled by default to automatically update Digital Twin properties after simulations.**
 
-This is intentional to allow developers to:
-- Run simulations locally without requiring Azure resources
-- Test the application without Azure credentials
-- Develop and debug without incurring Azure costs
+This ensures that ADT properties (totalIdleTime, totalProcessed, totalBlockedTime, etc.) are always updated with the latest simulation data.
+
+Users can disable Azure integration if needed for local development without Azure resources by setting `ENABLE_AZURE_INTEGRATION=false`.
 
 ## Current Status
 
 Check the current status:
 ```bash
 # In the API code (api/main.py line 62):
-ENABLE_AZURE_INTEGRATION = os.getenv('ENABLE_AZURE_INTEGRATION', 'false').lower() == 'true'
+ENABLE_AZURE_INTEGRATION = os.getenv('ENABLE_AZURE_INTEGRATION', 'true').lower() == 'true'
 
-# Default value is 'false' when environment variable is not set
+# Default value is 'true' when environment variable is not set
 ```
 
 You can verify this by running:
 ```bash
-python -c "import os; print('Azure Integration:', os.getenv('ENABLE_AZURE_INTEGRATION', 'false'))"
+python -c "import os; print('Azure Integration:', os.getenv('ENABLE_AZURE_INTEGRATION', 'true'))"
 ```
 
-## How to Enable Azure Integration
+## How to Disable Azure Integration (for local development)
 
 ### Option 1: Set Environment Variable (Recommended)
 
 **For the current terminal session:**
 ```bash
-export ENABLE_AZURE_INTEGRATION=true
-export AZURE_FUNCTION_ENDPOINT="https://your-function-app.azurewebsites.net/api/ProcessSimulationTelemetry"
-export AZURE_FUNCTION_KEY="your-function-key"  # Optional
+export ENABLE_AZURE_INTEGRATION=false
 
 # Then start the API
 cd api
@@ -41,8 +38,7 @@ uvicorn main:app --reload
 
 **For permanent configuration (add to `~/.bashrc` or `~/.zshrc`):**
 ```bash
-echo 'export ENABLE_AZURE_INTEGRATION=true' >> ~/.bashrc
-echo 'export AZURE_FUNCTION_ENDPOINT="https://your-function-app.azurewebsites.net/api/ProcessSimulationTelemetry"' >> ~/.bashrc
+echo 'export ENABLE_AZURE_INTEGRATION=false' >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -51,10 +47,7 @@ source ~/.bashrc
 Create a `.env` file in the project root:
 ```bash
 cat > .env << 'EOF'
-ENABLE_AZURE_INTEGRATION=true
-AZURE_FUNCTION_ENDPOINT=https://your-function-app.azurewebsites.net/api/ProcessSimulationTelemetry
-AZURE_FUNCTION_KEY=your-function-key
-AZURE_DIGITAL_TWINS_ENDPOINT=https://your-instance.api.eus.digitaltwins.azure.net
+ENABLE_AZURE_INTEGRATION=false
 EOF
 ```
 
@@ -67,9 +60,7 @@ uvicorn api.main:app --reload
 ### Option 3: Docker/Container Deployment
 
 ```bash
-docker run -e ENABLE_AZURE_INTEGRATION=true \
-  -e AZURE_FUNCTION_ENDPOINT="https://your-function-app.azurewebsites.net/api/ProcessSimulationTelemetry" \
-  -e AZURE_FUNCTION_KEY="your-key" \
+docker run -e ENABLE_AZURE_INTEGRATION=false \
   your-image
 ```
 
@@ -80,14 +71,12 @@ az webapp config appsettings set \
   --name your-app-name \
   --resource-group your-rg \
   --settings \
-    ENABLE_AZURE_INTEGRATION=true \
-    AZURE_FUNCTION_ENDPOINT=<endpoint> \
-    AZURE_FUNCTION_KEY=<key>
+    ENABLE_AZURE_INTEGRATION=false
 ```
 
-## Prerequisites for Enabling Azure Integration
+## Prerequisites for Azure Integration (Enabled by Default)
 
-Before enabling Azure integration, ensure you have:
+When Azure integration is enabled (the default), ensure you have:
 
 1. **Azure Digital Twins instance** created and configured
 2. **Azure Function App** deployed (or direct ADT access)
@@ -151,7 +140,17 @@ print(f'Function Key: {\"Set\" if os.getenv(\"AZURE_FUNCTION_KEY\") else \"Not s
 
 ## What Happens When Disabled vs Enabled?
 
-### When DISABLED (default):
+### When ENABLED (default):
+- ✅ Simulations run normally
+- ✅ Results computed and returned
+- ✅ Telemetry sent to Azure Function/Digital Twins
+- ✅ Device twins updated in real-time with latest properties
+- ✅ ADT properties (totalIdleTime, totalProcessed, etc.) always current
+- ✅ Relationships tracked
+- ⚠️  Requires Azure resources configured
+- ⚠️  May incur Azure costs
+
+### When DISABLED (for local dev):
 - ✅ Simulations run normally
 - ✅ Results are computed and returned
 - ✅ No Azure costs incurred
@@ -159,22 +158,16 @@ print(f'Function Key: {\"Set\" if os.getenv(\"AZURE_FUNCTION_KEY\") else \"Not s
 - ❌ No telemetry sent to Azure
 - ℹ️  API logs: "Azure integration is disabled"
 
-### When ENABLED:
-- ✅ Simulations run normally
-- ✅ Results computed and returned
-- ✅ Telemetry sent to Azure Function/Digital Twins
-- ✅ Device twins updated in real-time
-- ✅ Relationships tracked
-- ⚠️  Requires Azure resources
-- ⚠️  May incur Azure costs
-
 ## Troubleshooting
 
 ### "Azure integration is disabled" message
-**Cause**: `ENABLE_AZURE_INTEGRATION` environment variable is not set or is set to 'false'
+**Cause**: `ENABLE_AZURE_INTEGRATION` environment variable is explicitly set to 'false'
 
-**Solution**:
+**Solution (if you want it enabled)**:
+Remove the environment variable to use the default, or set it to 'true':
 ```bash
+unset ENABLE_AZURE_INTEGRATION
+# OR
 export ENABLE_AZURE_INTEGRATION=true
 ```
 
@@ -190,7 +183,6 @@ ENABLE_AZURE_INTEGRATION=FALSE
 ENABLE_AZURE_INTEGRATION=0
 ENABLE_AZURE_INTEGRATION=no
 ENABLE_AZURE_INTEGRATION=""
-ENABLE_AZURE_INTEGRATION=  # not set
 
 # Only these are considered true:
 ENABLE_AZURE_INTEGRATION=true
@@ -199,11 +191,16 @@ ENABLE_AZURE_INTEGRATION=TRUE
 ENABLE_AZURE_INTEGRATION=1
 ENABLE_AZURE_INTEGRATION=yes
 ENABLE_AZURE_INTEGRATION=on
+
+# Not set = default is TRUE (enabled)
+# (unset ENABLE_AZURE_INTEGRATION)
 ```
 
-**Solution**: Use lowercase `true`:
+**Solution**: Use lowercase `true` or unset the variable:
 ```bash
 export ENABLE_AZURE_INTEGRATION=true
+# OR
+unset ENABLE_AZURE_INTEGRATION
 ```
 
 ### Integration enabled but no updates in Azure
@@ -286,9 +283,9 @@ az webapp deployment source config-zip \
 
 ## Summary
 
-**Azure integration is disabled by default** to support local development without Azure dependencies. 
+**Azure integration is enabled by default** to ensure ADT properties are always updated with the latest simulation data.
 
-**To enable**: Set `ENABLE_AZURE_INTEGRATION=true` environment variable.
+**To disable (for local dev)**: Set `ENABLE_AZURE_INTEGRATION=false` environment variable.
 
 **To verify**: Run `python smoke_test.py --skip-simulation` or check `/azure/diagnostics` endpoint.
 

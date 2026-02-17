@@ -149,10 +149,11 @@ class DigitalTwinsClientWrapper:
         for attempt in range(self.max_retries):
             try:
                 # Create JSON Patch document for property updates
+                # Use 'add' operation which works for both new and existing properties
                 patch = []
                 for key, value in update.properties.items():
                     patch.append({
-                        "op": "replace",
+                        "op": "add",
                         "path": f"/{key}",
                         "value": value
                     })
