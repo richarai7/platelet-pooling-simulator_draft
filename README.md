@@ -85,16 +85,21 @@ pip install -r requirements-azure.txt
 pip install -e ".[dev]"
 ```
 
-## ❓ Why is Azure Integration Disabled?
+## ❓ Azure Integration Configuration
 
-**Azure integration is disabled by default** to allow local development without Azure resources.
+**Azure integration is enabled by default** to automatically update ADT properties after simulations.
 
 **Check status**:
 ```bash
 ./check_azure_integration.sh
 ```
 
-**To enable (Option 1: Using .env file)**:
+**To disable for local development**:
+```bash
+export ENABLE_AZURE_INTEGRATION=false
+```
+
+**To configure Azure endpoints**:
 ```bash
 # 1. Create .env file from template
 cp .env.example .env
@@ -107,12 +112,6 @@ source load_env.sh
 
 # 4. Verify
 ./check_azure_integration.sh
-```
-
-**To enable (Option 2: Direct export)**:
-```bash
-export ENABLE_AZURE_INTEGRATION=true
-export AZURE_FUNCTION_ENDPOINT="https://your-function-app.azurewebsites.net/api/ProcessSimulationTelemetry"
 ```
 
 See **[ENV_SETUP.md](ENV_SETUP.md)** for complete .env configuration guide or **[WHY_AZURE_INTEGRATION_DISABLED.md](WHY_AZURE_INTEGRATION_DISABLED.md)** for details.
