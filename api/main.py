@@ -237,47 +237,49 @@ async def send_telemetry_to_azure_function(telemetry: Dict[str, Any]) -> Optiona
 async def send_telemetry_direct_to_adt(telemetry: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Send telemetry directly to Azure Digital Twins (fallback method)
-    
+
     Args:
         telemetry: Telemetry payload
-    
+
     Returns:
         Response with update status or None if failed
     """
     try:
         from azure.identity import DefaultAzureCredential
         from azure.digitaltwins.core import DigitalTwinsClient
-        
+
         # Connect to Azure Digital Twins
         adt_endpoint = os.getenv('AZURE_DIGITAL_TWINS_ENDPOINT', 'https://platelet-dt-instance-new.api.eus.digitaltwins.azure.net')
+        logger.info(f"Connecting to Azure Digital Twins directly at {adt_endpoint}")
         credential = DefaultAzureCredential()
         dt_client = DigitalTwinsClient(adt_endpoint, credential)
-        
+
         success_count = 0
         failed_updates = []
-        
+
         for update in telemetry.get('telemetry', []):
             twin_id = update.get('twin_id')
             properties = update.get('properties', {})
-            
+
             if not twin_id:
                 continue
-            
+
             try:
                 # Create JSON patch for update
+                # Use 'add' operation which works for both new and existing properties
                 patch = []
                 for key, value in properties.items():
                     patch.append({
-                        "op": "replace",
+                        "op": "add",
                         "path": f"/{key}",
                         "value": value
                     })
-                
+
                 # Update twin
                 dt_client.update_digital_twin(twin_id, patch)
                 success_count += 1
-                logger.debug(f"Updated twin {twin_id} (direct)")
-                
+                logger.info(f"Updated twin {twin_id} with {len(properties)} properties (direct)")
+
             except Exception as e:
                 logger.error(f"Failed to update twin {twin_id}: {e}")
                 failed_updates.append({"twin_id": twin_id, "error": str(e)})
