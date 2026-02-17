@@ -92,27 +92,55 @@ az storage account create \
   --location eastus \
   --sku Standard_LRS
 
-# Create a container
+# Enable blob public access at storage account level (REQUIRED)
+az storage account update \
+  --name plateletmodels \
+  --resource-group <your-resource-group> \
+  --allow-blob-public-access true
+
+# Create a container with public blob access
 az storage container create \
   --account-name plateletmodels \
   --name models \
-  --public-access blob
+  --public-access blob \
+  --auth-mode login
+
+# Set container permissions (ensure public access)
+az storage container set-permission \
+  --name models \
+  --account-name plateletmodels \
+  --public-access blob \
+  --auth-mode login
 
 # Upload your GLTF file
 az storage blob upload \
   --account-name plateletmodels \
   --container-name models \
   --name platelet_lab.gltf \
-  --file 3d_models/templates/platelet_lab_template.gltf
+  --file 3d_models/templates/platelet_lab_template.gltf \
+  --auth-mode login
 
 # Get the URL
 az storage blob url \
   --account-name plateletmodels \
   --container-name models \
   --name platelet_lab.gltf
+
+# Test public access (IMPORTANT - should return 200 OK)
+curl -I https://plateletmodels.blob.core.windows.net/models/platelet_lab.gltf
 ```
 
 Save the blob URL - you'll need it in the next step.
+
+**Common Issue - 403 Forbidden Error:**
+
+If you get a 403 error when loading the model, this means the blob storage permissions are not set correctly. Run the automated fix script:
+
+```bash
+./scripts/fix_blob_storage_permissions.sh
+```
+
+Or see the [detailed troubleshooting guide](FIX_BLOB_STORAGE_403.md) for manual steps.
 
 ### Step 3: Update Digital Twin Models
 
@@ -326,11 +354,43 @@ az dt twin query \
 
 **Problem**: GLTF model fails to load in 3D Scenes Studio
 
+**Most Common Cause**: 403 Forbidden Error - blob is not publicly accessible
+
 **Solutions**:
-- Verify blob URL is publicly accessible
-- Check file size is under 100MB
-- Ensure GLTF is version 2.0
-- Validate GLTF using [glTF Validator](https://github.khronos.org/glTF-Validator/)
+1. **Quick Fix**: Run the automated script:
+   ```bash
+   ./scripts/fix_blob_storage_permissions.sh
+   ```
+
+2. **Manual Fix**:
+   ```bash
+   # Enable blob public access on storage account
+   az storage account update \
+     --name plateletmodels \
+     --resource-group <your-resource-group> \
+     --allow-blob-public-access true
+
+   # Set container permissions
+   az storage container set-permission \
+     --name models \
+     --account-name plateletmodels \
+     --public-access blob \
+     --auth-mode login
+
+   # Test access
+   curl -I https://plateletmodels.blob.core.windows.net/models/platelet_lab.gltf
+   ```
+
+3. **Verify blob URL is publicly accessible**:
+   - Open URL in browser - should download or display file
+   - Should NOT show XML error or "AuthenticationFailed"
+
+4. **Other checks**:
+   - Check file size is under 100MB
+   - Ensure GLTF is version 2.0
+   - Validate GLTF using [glTF Validator](https://github.khronos.org/glTF-Validator/)
+
+For detailed troubleshooting, see [Fix Blob Storage 403 Error](FIX_BLOB_STORAGE_403.md).
 
 ### Elements Not Mapping to Twins
 

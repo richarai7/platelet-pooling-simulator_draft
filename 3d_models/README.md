@@ -197,13 +197,33 @@ az storage account create \
   --sku Standard_LRS
 ```
 
-### Step 2: Create Container
+### Step 2: Create Container and Enable Public Access
 
 ```bash
+# Create container with public blob access
 az storage container create \
   --account-name plateletmodels \
   --name models \
-  --public-access blob
+  --public-access blob \
+  --auth-mode login
+
+# IMPORTANT: Enable blob public access at storage account level
+az storage account update \
+  --name plateletmodels \
+  --resource-group <your-resource-group> \
+  --allow-blob-public-access true
+
+# Set container permissions
+az storage container set-permission \
+  --name models \
+  --account-name plateletmodels \
+  --public-access blob \
+  --auth-mode login
+```
+
+**Note:** If you get a 403 error when accessing the blob, see [Fix Blob Storage 403 Error](../docs/FIX_BLOB_STORAGE_403.md) or run:
+```bash
+./scripts/fix_blob_storage_permissions.sh
 ```
 
 ### Step 3: Upload Model
@@ -213,19 +233,31 @@ az storage blob upload \
   --account-name plateletmodels \
   --container-name models \
   --name platelet_lab.gltf \
-  --file templates/platelet_lab_template.gltf
+  --file templates/platelet_lab_template.gltf \
+  --auth-mode login
 ```
 
-### Step 4: Get URL
+### Step 4: Get URL and Test Access
 
 ```bash
+# Get the blob URL
 az storage blob url \
   --account-name plateletmodels \
   --container-name models \
   --name platelet_lab.gltf
+
+# Test public access (should return 200 OK)
+curl -I https://plateletmodels.blob.core.windows.net/models/platelet_lab.gltf
 ```
 
 Save this URL - you'll need it for 3D Scenes Studio configuration.
+
+**Troubleshooting:** If you get HTTP 403 (Forbidden), the blob is not publicly accessible. Run the fix script:
+```bash
+./scripts/fix_blob_storage_permissions.sh
+```
+
+See [detailed troubleshooting guide](../docs/FIX_BLOB_STORAGE_403.md) for more information.
 
 ## Twin Mapping Configuration
 
