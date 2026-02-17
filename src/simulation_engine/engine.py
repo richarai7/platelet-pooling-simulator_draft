@@ -567,6 +567,7 @@ class SimulationEngine:
                 "random_seed": self.config["simulation"]["random_seed"],
                 "completed_at": datetime.now().isoformat(),
                 "engine_version": "0.1.0",
+                "config": self.config,  # Store full config for downstream processing (e.g., Azure Digital Twins)
             },
             "summary": {
                 "total_events": self._event_count,
@@ -623,6 +624,7 @@ class SimulationEngine:
                 "random_seed": self.config["simulation"]["random_seed"],
                 "completed_at": datetime.now().isoformat(),
                 "engine_version": "0.1.0",
+                "config": self.config,  # Store full config for downstream processing (e.g., Azure Digital Twins)
             },
             "summary": {
                 "total_events": self._event_count,
