@@ -42,7 +42,7 @@ def parse_bool_env(value: str, default: bool = False) -> bool:
 
 # Test configuration
 API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost:8000')
-AZURE_ENABLED = parse_bool_env(os.getenv('ENABLE_AZURE_INTEGRATION', 'false'))
+AZURE_ENABLED = parse_bool_env(os.getenv('ENABLE_AZURE_INTEGRATION', 'true'))
 
 # Test data constants
 SMOKE_TEST_RUN_NAME = "Smoke Test"

@@ -30,7 +30,7 @@ def test_ui_api_azure_flow():
     print("\nStep 2: Running simulation through API...")
     
     # Check if Azure integration is enabled
-    azure_enabled = os.getenv('ENABLE_AZURE_INTEGRATION', 'false').lower() == 'true'
+    azure_enabled = os.getenv('ENABLE_AZURE_INTEGRATION', 'true').lower() == 'true'
     
     if azure_enabled:
         print(f"   Azure integration: ENABLED")
