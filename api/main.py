@@ -59,7 +59,7 @@ active_simulations: Dict[str, SimulationEngine] = {}
 # Azure Function configuration
 AZURE_FUNCTION_ENDPOINT = os.getenv('AZURE_FUNCTION_ENDPOINT')
 AZURE_FUNCTION_KEY = os.getenv('AZURE_FUNCTION_KEY')
-ENABLE_AZURE_INTEGRATION = os.getenv('ENABLE_AZURE_INTEGRATION', 'false').lower() == 'true'
+ENABLE_AZURE_INTEGRATION = os.getenv('ENABLE_AZURE_INTEGRATION', 'true').lower() == 'true'
 
 # Device ID mapping: simulation -> Azure Digital Twins
 DEVICE_ID_MAPPING = {
