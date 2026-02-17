@@ -254,6 +254,15 @@ If the E2E flow is not working:
    az dt twin query --dt-name <instance> --query-command "SELECT * FROM DIGITALTWINS"
    ```
 
+6. **Fix 403 Error Loading 3D Models** (Blob Storage):
+   ```bash
+   # Quick fix for blob storage permissions
+   ./scripts/fix_blob_storage_permissions.sh
+
+   # See detailed guide
+   cat docs/FIX_BLOB_STORAGE_403.md
+   ```
+
 See [docs/FUNCTION_APP_PERMISSIONS.md](docs/FUNCTION_APP_PERMISSIONS.md) for detailed troubleshooting.
 
 ## Quick Start - Platelet Pooling Simulation
