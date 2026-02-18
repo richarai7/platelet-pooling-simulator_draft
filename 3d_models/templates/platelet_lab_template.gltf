@@ -169,9 +169,10 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1
           },
-          "indices": 1,
+          "indices": 2,
           "material": 0
         }
       ]
@@ -181,9 +182,10 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1
           },
-          "indices": 1,
+          "indices": 2,
           "material": 1
         }
       ]
@@ -193,9 +195,10 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1
           },
-          "indices": 1,
+          "indices": 2,
           "material": 2
         }
       ]
@@ -205,9 +208,10 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1
           },
-          "indices": 1,
+          "indices": 2,
           "material": 3
         }
       ]
@@ -217,9 +221,10 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1
           },
-          "indices": 1,
+          "indices": 2,
           "material": 4
         }
       ]
@@ -229,9 +234,10 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1
           },
-          "indices": 1,
+          "indices": 2,
           "material": 5
         }
       ]
@@ -241,9 +247,10 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1
           },
-          "indices": 1,
+          "indices": 2,
           "material": 6
         }
       ]
@@ -253,9 +260,10 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1
           },
-          "indices": 1,
+          "indices": 2,
           "material": 7
         }
       ]
@@ -265,9 +273,10 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1
           },
-          "indices": 1,
+          "indices": 2,
           "material": 8
         }
       ]
@@ -277,9 +286,10 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1
           },
-          "indices": 1,
+          "indices": 2,
           "material": 9
         }
       ]
@@ -289,13 +299,19 @@
     {
       "bufferView": 0,
       "componentType": 5126,
-      "count": 8,
+      "count": 24,
       "type": "VEC3",
       "max": [0.5, 0.5, 0.5],
       "min": [-0.5, -0.5, -0.5]
     },
     {
       "bufferView": 1,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
       "componentType": 5123,
       "count": 36,
       "type": "SCALAR"
@@ -305,20 +321,26 @@
     {
       "buffer": 0,
       "byteOffset": 0,
-      "byteLength": 96,
+      "byteLength": 288,
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteOffset": 96,
+      "byteOffset": 288,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
       "byteLength": 72,
       "target": 34963
     }
   ],
   "buffers": [
     {
-      "byteLength": 168,
-      "uri": "data:application/octet-stream;base64,AAAAAL8AAAC/AAAAPwAAAL8AAAC/AAAAvwAAAD8AAAC/AAAAPwAAAD8AAAC/AAAAAL8AAAA/AAAAPwAAAL8AAAA/AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAA/AAEAAgADAAIAAQAEAAUABgAHAAYABQAIAAkACgALAAoACQAMAA0ADgAPAA4ADQAQABEAEQASABMA"
+      "byteLength": 648,
+      "uri": "data:application/octet-stream;base64,AAAAvwAAAL8AAAC/AAAAvwAAAL8AAAA/AAAAvwAAAD8AAAC/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAC/AAAAPwAAAL8AAAA/AAAAPwAAAD8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAL8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAL8AAAC/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAL8AAAC/AAAAvwAAAD8AAAC/AAAAPwAAAD8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAL8AAAA/AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAC/AAAAPwAAAD8AAAA/AAAAPwAAAL8AAAC/AAAAPwAAAL8AAAA/AAAAPwAAAD8AAAC/AAAAPwAAAD8AAAA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAEAAAACAAAAAgAAAAMAAAABAAAABAAAAAUAAAAGAAAABgAAAAcAAAAEAAAACAAAAAkAAAAKAAAACgAAAAsAAAAIAAAADAAAAA0AAAAOAAAADgAAAA8AAAAMAAAAEAAAABEAAAASAAAAEgAAABMAAAAQAAAAFAAAABUAAAAWAAAAFgAAABcAAAAUAAAA"
     }
   ],
   "materials": [
