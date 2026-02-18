@@ -7,9 +7,10 @@ This directory contains 3D model files and utilities for visualizing your Platel
 ```
 3d_models/
 ├── README.md                          # This file
+├── generate_device_shapes.py          # Script to generate realistic device shapes
 ├── add_twin_metadata_to_gltf.py       # Script to add twin metadata to GLTF files
 ├── templates/
-│   └── platelet_lab_template.gltf     # Sample GLTF model with all 10 devices
+│   └── platelet_lab_template.gltf     # GLTF model with all 10 devices (realistic shapes)
 ├── metadata/
 │   └── twin_mapping.json              # Device-to-twin mapping configuration
 └── textures/                          # Directory for texture files (optional)
@@ -55,7 +56,17 @@ python add_twin_metadata_to_gltf.py \
 The `platelet_lab_template.gltf` file includes:
 
 - **10 device nodes** - One for each device in the platelet pooling flow
-- **Simple cube geometry** - Placeholder shapes (replace with detailed models)
+- **Realistic 3D shapes** - Each device has a shape representing its real-world appearance:
+  - Buffy Coat Pack: Small packet (flat rectangular box)
+  - Platelet Washer: Mini washing machine (compact box)
+  - Centrifuge: Top-load washing machine (tall square box)
+  - Separator: Cylinder shape
+  - Resting Trolly: Clinical trolly (wide, low platform)
+  - Agitator: Big fridge (tall rectangular box)
+  - Macropress: Microwave type (wide, shallow box)
+  - Testing Agitator: Big fridge (tall rectangular box)
+  - Labeling: Printing machine (medium box)
+  - Release: Bench (long, low rectangular shape)
 - **Color-coded materials** - Different colors for each device type
 - **Twin metadata** - Pre-configured in node 'extras' fields
 - **Spatial layout** - Devices arranged in a 2x5 grid layout
@@ -141,6 +152,55 @@ After running the script, each node will have metadata like:
     "dtmi": "dtmi:platelet:Device;1"
   }
 }
+```
+
+## Generating Device Shapes
+
+### Using the Shape Generator Script
+
+The `generate_device_shapes.py` script automatically generates realistic 3D shapes for each device type:
+
+```bash
+# Run the script to update the template with realistic shapes
+python generate_device_shapes.py
+```
+
+### What It Does
+
+The script:
+1. Creates appropriate geometries for each device type:
+   - **Buffy Coat Pack**: Small packet (flat rectangular box: 0.3×0.1×0.4)
+   - **Platelet Washer**: Mini washing machine (compact: 0.6×0.8×0.6)
+   - **Centrifuge**: Top-load washing machine (tall: 0.8×1.2×0.8)
+   - **Separator**: Cylinder shape (radius: 0.4, height: 1.0)
+   - **Resting Trolly**: Clinical trolly (wide platform: 1.0×0.4×0.6)
+   - **Agitator**: Big fridge (tall: 1.0×1.8×0.8)
+   - **Macropress**: Microwave type (shallow: 0.8×0.5×0.6)
+   - **Testing Agitator**: Big fridge (tall: 1.0×1.8×0.8)
+   - **Labeling**: Printing machine (medium: 0.7×0.5×0.5)
+   - **Release**: Bench (long: 1.5×0.4×0.5)
+
+2. Generates vertex data (positions, normals, indices) for each shape
+3. Updates the GLTF file with new geometries
+4. Preserves all node metadata and material assignments
+
+### Shape Details
+
+- **Box shapes**: Use standard cuboid geometry with 24 vertices, 36 indices (12 triangles)
+- **Cylinder shapes**: Use smooth cylinder geometry with 68 vertices, 192 indices (64 triangles)
+- **Dimensions**: All units are in meters, designed for Azure 3D Scenes Studio visualization
+
+### Regenerating Shapes
+
+If you need to modify shapes:
+
+1. Edit the `create_device_geometries()` function in `generate_device_shapes.py`
+2. Adjust dimensions using `create_cube_vertices(width, height, depth)` or `create_cylinder_vertices(radius, height, segments)`
+3. Run the script to regenerate the GLTF file
+
+```python
+# Example: Make the agitator bigger
+positions, normals, indices = create_cube_vertices(1.2, 2.0, 1.0)  # wider and taller
 ```
 
 ## Creating Your Own 3D Model
